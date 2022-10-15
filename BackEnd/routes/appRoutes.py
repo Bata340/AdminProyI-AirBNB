@@ -20,7 +20,7 @@ async def register(user: schema.User):
 async def login(user: schema.User):
 
     if user.username not in registeredUsers.keys():
-        return HTTPException(status_code=404, detail="User with name " + user["username"] + " does not exist")
+        return HTTPException(status_code=404, detail="User with name " + user.username + " does not exist")
 
     if registeredUsers[user.username] != user.password:
         return HTTPException(status_code=401, detail="Wrong password")
