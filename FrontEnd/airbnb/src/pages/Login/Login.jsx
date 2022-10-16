@@ -1,21 +1,50 @@
 import React from 'react'
-import { Button, Container, IconButton, InputAdornment, TextField } from '@mui/material'
+import { Button, Container, IconButton, InputAdornment, TextField, Alert, AlertTitle, Collapse } from '@mui/material'
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Login.css'
+import './Login.css';
+
+//require("dotenv").config();
 
 export const Login = (props) => {
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [showErrorLogin, setShowErrorLogin] = useState(false);
+    const [errorLogin, setErrorLogin] = useState('');
+    const API_URL = 'http://localhost:8000';
     const navigate = useNavigate();
 
-    const onSubmitLogin = (event) => {
+    const onSubmitLogin = async (event) => {
         event.preventDefault();
-        alert("DEBERIA LLAMAR A LA API CON USER Y PASSWORD PARA VALIDAR SI EXISTE. "+
-            "SI EXISTE ME DEVUELVE UN JWT SUPONGO Y AHÍ LO METEMOS AL LOCAL STORAGE COMO sessionToken");
+        const paramsLogin = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password,
+            })
+        };
+        const url = `${API_URL}/login`;
+        const response = await fetch(
+            url,
+            paramsLogin
+        );
+        const jsonResponse = await response.json();
+        if (response.status === 200){
+            if(!jsonResponse.status_code){
+                localStorage.setItem("sessionToken", true);
+                localStorage.setItem("username", username);
+                window.location.reload();
+            }else{
+                setErrorLogin(jsonResponse.detail);
+                setShowErrorLogin(true);
+            }
+        }
     }
 
     const onPressSignUp = (event) => {
@@ -30,10 +59,21 @@ export const Login = (props) => {
         event.preventDefault();
     };
 
+    const onCloseError = (event) => {
+        setShowErrorLogin(false);
+        setErrorLogin('');
+    }
+
   return (
     <>
         <form onSubmit = {onSubmitLogin}>
             <Container maxWidth="sm" id="formWrapper">
+                <Collapse in={showErrorLogin}>
+                    <Alert onClose={onCloseError} severity="error" id="AlertError">
+                        <AlertTitle><strong>Login Error</strong></AlertTitle>
+                            {errorLogin}
+                    </Alert>
+                </Collapse>
                 <Container className={"LogoContainer"}>
                     <h1>ACA EL LOGO DE NUESTRA COSA</h1>
                 </Container>

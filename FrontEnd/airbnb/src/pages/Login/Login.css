@@ -6,6 +6,10 @@
     text-align: center;
 }
 
+#AlertError{
+    text-align: left;
+}
+
 .inputClass{
     margin-top: 1rem;
 }

@@ -4,7 +4,18 @@ from model import schema
 import json
 
 router = APIRouter()
+
 registeredUsers = {}
+registeredUsers['generico'] =  schema.User(
+        username = "generico",
+        password = "generico",
+        first_name = "Usuario",
+        last_name = "Generico",
+        age = 30,
+        phone_number = 2222-343434,
+        location = "Argentina",
+        login = False
+    )
 
 @router.post("/register", status_code=status.HTTP_200_OK)
 async def register(user: schema.User):
