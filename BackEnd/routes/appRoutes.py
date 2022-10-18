@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from model import schema
-import json
+import uuid
+
 
 router = APIRouter()
 
@@ -16,7 +17,13 @@ registeredUsers['generico'] =  schema.User(
         location = "Argentina",
         login = False
     )
-
+registeredProperties = {}
+def removeNoneValues(dict_aux: dict):
+    dict_aux2 = {}
+    for key, value in dict_aux.items():
+        if value is not None:
+            dict_aux2[key] = value
+    return dict_aux2
 @router.post("/register", status_code=status.HTTP_200_OK)
 async def register(user: schema.User):
 
@@ -38,7 +45,23 @@ async def login(user: schema.UserLogin):
     return {"message" : "ok"}
 
 @router.get("/{username}", status_code=status.HTTP_200_OK)
-async def get(username: str):
+async def getUser(username: str):
     if username not in registeredUsers.keys():
         return HTTPException(status_code=404, detail="User with name " + username + " does not exist")
     return {"message": registeredUsers[username]}
+
+
+@router.post("/property/", status_code=status.HTTP_200_OK)
+async def create_property(property: schema.Property):
+    id = str(uuid.uuid4())
+    registeredProperties[id] = property
+    return {"message" : "register propery with id: " + id}
+
+@router.get("/property/{id}", status_code=status.HTTP_200_OK)
+async def getProperty(id: str):
+    if id not in registeredProperties.keys():
+        return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
+    
+    return {"message": registeredProperties[id]}
+
+

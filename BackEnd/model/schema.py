@@ -1,6 +1,6 @@
-from typing import Union
+from typing import List, Optional, Union
 from pydantic import BaseModel
-from tomlkit import integer
+
 
 
 class User(BaseModel):
@@ -16,3 +16,19 @@ class User(BaseModel):
 class UserLogin(BaseModel):
     username: str
     password: str    
+
+class Property(BaseModel):
+    name: str
+    owner: str
+    price: int
+    description: str
+    location: str
+    score: int
+    photos: Union[List[str], None] = None
+
+class PropertyPatch(BaseModel):
+    name: Optional[str] = None
+    price: Optional[int] = None
+    description: Optional[str] = None
+    location: Optional[str] = None
+    photos: Optional[List[str]] = None
