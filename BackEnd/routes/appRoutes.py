@@ -76,3 +76,10 @@ async def update_property(id: str, property: schema.PropertyPatch):
     registeredProperties[id] = updated_property
 
     return {"message": registeredProperties[id]}
+
+@router.delete("/property/{id}", status_code=status.HTTP_200_OK)
+async def delete_property(id: str):
+    if id not in registeredProperties.keys():
+        return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
+    registeredProperties.pop(id)
+    return {"message": "property with id " + id + "was deleted"} 
