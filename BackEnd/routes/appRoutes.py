@@ -65,3 +65,14 @@ async def getProperty(id: str):
     return {"message": registeredProperties[id]}
 
 
+@router.patch("/property/{id}", status_code=status.HTTP_200_OK)
+async def update_property(id: str, property: schema.PropertyPatch):
+    if id not in registeredProperties.keys():
+        return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
+
+    stored_property_data = registeredProperties[id]
+    update_data = property.dict(exclude_unset=True)
+    updated_property = stored_property_data.copy(update=update_data)
+    registeredProperties[id] = updated_property
+
+    return {"message": registeredProperties[id]}
