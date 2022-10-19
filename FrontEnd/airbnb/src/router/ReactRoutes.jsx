@@ -3,7 +3,7 @@ import{ BrowserRouter as Router, Routes as Switch, Route } from 'react-router-do
 
 function checkTokenAuth(){
 	const token = localStorage.getItem('sessionToken');
-	return (token == true || token == 'true')
+	return (token === true || token === 'true');
 }
 
 function ReactRoutes() {

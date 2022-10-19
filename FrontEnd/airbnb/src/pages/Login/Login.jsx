@@ -38,7 +38,7 @@ export const Login = (props) => {
         if (response.status === 200){
             if(!jsonResponse.status_code){
                 localStorage.setItem("sessionToken", true);
-                localStorage.setItem("username", username);
+                localStorage.setItem("username", JSON.parse(paramsLogin.body).username);
                 window.location.reload();
             }else{
                 setErrorLogin(jsonResponse.detail);
