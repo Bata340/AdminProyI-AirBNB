@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, Container, IconButton, InputAdornment, TextField, Alert, AlertTitle, Collapse } from '@mui/material'
-import { Visibility, VisibilityOff, WindowOutlined } from '@mui/icons-material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SignUp.css';
