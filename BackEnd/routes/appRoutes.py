@@ -83,3 +83,7 @@ async def delete_property(id: str):
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
     registeredProperties.pop(id)
     return {"message": "property with id " + id + "was deleted"} 
+
+@router.get("/properties", status_code=status.HTTP_200_OK)
+async def get_property(): 
+    return json.dumps(registeredProperties)
