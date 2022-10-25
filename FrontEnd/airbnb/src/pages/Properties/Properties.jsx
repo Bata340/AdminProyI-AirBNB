@@ -7,47 +7,68 @@ import { useEffect, useState } from 'react';
 
 export const Properties = () => {
 
-    //En photos tiene que ir el nombre de la foto de firebase
-    const [inmuebles, setInmuebles] = useState ([
-        {key:1, name:"Cabaña1", owner:"generico", price:12, description:"descripcion cabaña 1", location:"CABA", score:1, photos:["1b05797bb2fea225f8c5f536497c922d.jpg"]},
-        {key:2, name:"Cabaña2", owner:"generico", price:123, description:"descripcion cabaña 2", location:"Tierra del Fuego", score:2, photos:["227437cbae8576fa0660f90b4fb803c4.png","1b05797bb2fea225f8c5f536497c922d.jpg","364046840f5e0e09503134bd790bd924.jpg"]},
-        {key:3, name:"Hotel 1", owner:"generico", price:1234, description:"descripcion Hotel", location:"Cordoba", score:4, photos:["364046840f5e0e09503134bd790bd924.jpg","1b05797bb2fea225f8c5f536497c922d.jpg","364046840f5e0e09503134bd790bd924.jpg"]},
-        {key:4, name:"Hotel 1", owner:"generico", price:1234, description:"descripcion Hotel", location:"Cordoba", score:4, photos:["364046840f5e0e09503134bd790bd924.jpg"]},
-        {key:5, name:"Hotel 1", owner:"generico", price:1234, description:"descripcion Hotel", location:"Cordoba", score:4, photos:["1b05797bb2fea225f8c5f536497c922d.jpg"]},
-        {key:6, name:"Hotel 1", owner:"generico", price:1234, description:"descripcion Hotel", location:"Cordoba", score:4, photos:["227437cbae8576fa0660f90b4fb803c4.png"]}
-    ]);
+    const API_URL = 'http://localhost:8000';
 
-    const [ imagesLoading, setImagesLoading] = useState( true );
+    const [ inmuebles, setInmuebles ] = useState ( [] );
+    const [ loading, setLoading ] = useState( true );
     const [ urlsImages, setUrlsImages ] = useState( [] );
 
 
-    useEffect( () => {
-
-        async function getImagesFromFireBase(inmuebles){
-            const urlsArray = [];
-            for ( let i=0; i < inmuebles.length ; i++ ){
-                const url = await getFirebaseImage( 
-                    inmuebles[i].photos[0] 
-                );
-                urlsArray.push(url);
-            }
-            setUrlsImages( urlsArray );
-            setImagesLoading( false );
+    async function getImagesFromFireBase( inmuebles ){
+        const urlsArray = [];
+        for ( let i=0; i < inmuebles.length ; i++ ){
+            console.log(inmuebles[i].photos[0])
+            const url = await getFirebaseImage( 
+                `files/${inmuebles[i].photos[0]}`
+            );
+            urlsArray.push(url);
         }
-        
-        getImagesFromFireBase(inmuebles);
+        setUrlsImages( urlsArray );
+        setInmuebles( inmuebles );
+        setLoading( false );
+    }
 
-    }, [inmuebles]);
-    
 
-    return (
-        !imagesLoading ? 
+    async function getProperties(){
+        const paramsUpload = {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+        const url = `${API_URL}/properties`;
+        const response = await fetch(
+            url,
+            paramsUpload
+        );
+        const jsonResponse = await response.json();
+        if (response.status === 200){
+            if(!jsonResponse.status_code){
+                const arrayProps = [];
+                const keys = Object.keys(jsonResponse);
+                for ( let i=0; i<keys.length; i++){
+                    jsonResponse[keys[i]].key = keys[i];
+                    console.log(jsonResponse[keys[i]])
+                    arrayProps.push(jsonResponse[keys[i]]);
+                }
+                //setInmuebles(arrayProps);
+                await getImagesFromFireBase(arrayProps);
+            }
+        }     
+    }
+
+
+    useEffect( () => {
+        getProperties();
+    }, []);
+
+
+    return (    
+        !loading ? 
         <Container>
             <Grid container>
                 
                 {inmuebles.map( (prop, idx) => {
-                    console.log(urlsImages);
-                    console.log(idx);
                     return (
                         <Grid style={{"marginTop":"2rem"}} item xs={4} key={`${prop.key}_${urlsImages[idx]}`}>
                             <Property 

@@ -27,9 +27,8 @@ export const firebaseStorage = getStorage(firebaseApp);
 export const handleUploadFirebaseImage = async (name, image) => {
     const formatFile = '.'+name.split('.')[1];
     const firebaseFileName = md5(name+(new Date()))+formatFile;
-    //image.name = firebaseFileName;
 
-    const storageRef = ref(firebaseStorage, firebaseFileName);
+    const storageRef = ref(firebaseStorage, `files/${firebaseFileName}`);
     const uploadTask = await uploadBytesResumable(storageRef, image);
 
     return firebaseFileName; 

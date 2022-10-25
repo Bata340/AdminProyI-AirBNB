@@ -41,7 +41,6 @@ export const PropertiesUpload = (props) => {
             })
         };
         const url = `${API_URL}/property/`;
-        console.log(paramsUpload);
         const response = await fetch(
             url,
             paramsUpload
@@ -50,9 +49,8 @@ export const PropertiesUpload = (props) => {
         setLoadingAsync(false);
         if (response.status === 200){
             if(!jsonResponse.status_code){
-                alert(jsonResponse.message);
-                //navigate('/');
-                //window.location.reload();
+                navigate('/');
+                window.location.reload();
             }else{
                 setErrorPropertyUpload(jsonResponse.detail);
                 setShowErrorPropertyUpload(true);
@@ -78,7 +76,7 @@ export const PropertiesUpload = (props) => {
             hashedNames.push(await handleUploadFirebaseImage(photosUpload[i].name, photosUpload[i]) );
         }
         setPhotosNamesHashed(hashedNames);
-        return photosNamesHashed;
+        return hashedNames;
     }
 
   return (
