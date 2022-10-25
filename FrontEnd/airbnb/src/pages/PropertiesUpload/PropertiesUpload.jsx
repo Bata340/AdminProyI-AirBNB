@@ -1,22 +1,30 @@
-import { Button, Container, TextField, Alert, AlertTitle, Collapse } from '@mui/material';
+import { Button, Container, TextField, Alert, AlertTitle, Collapse, Input, 
+    Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, CircularProgress  } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { handleUploadFirebaseImage, deleteFirebaseImage } from '../../common/FirebaseHandler';
 import './PropertiesUpload.css';
+
 
 export const PropertiesUpload = (props) => {
 
-    const [price, setPrice] = useState('');
+    const [price, setPrice] = useState(0);
     const [propertyName, setPropertyName] = useState('');
     const [location, setLocation] = useState('');
     const [description, setDescription] = useState('');
     const [photosNamesHashed, setPhotosNamesHashed] = useState([]);
+    const [photosUpload, setPhotosUpload] = useState([]);
+    const [fileInputShow, setFileInputShow] = useState("");
     const [showErrorPropertyUpload, setShowErrorPropertyUpload] = useState(false);
     const [errorPropertyUpload, setErrorPropertyUpload] = useState('');
+    const [loadingAsync, setLoadingAsync] = useState(false);
     const API_URL = 'http://localhost:8000';
     const navigate = useNavigate();
 
     const onSubmitSignUp = async (event) => {
         event.preventDefault();
+        setLoadingAsync(true);
+        let photosNames = await handleReUploadPhotos();
         const paramsUpload = {
             method: "POST",
             headers: {
@@ -24,24 +32,27 @@ export const PropertiesUpload = (props) => {
             },
             body: JSON.stringify({
                 name: propertyName,
-                owner: localStorage.getItem('username'),
+                owner: localStorage.getItem('user'),
                 price: price,
                 description: description,
                 location: location,
                 score: 0,
-                photos: photosNamesHashed
+                photos: photosNames
             })
         };
         const url = `${API_URL}/property/`;
+        console.log(paramsUpload);
         const response = await fetch(
             url,
             paramsUpload
         );
         const jsonResponse = await response.json();
+        setLoadingAsync(false);
         if (response.status === 200){
             if(!jsonResponse.status_code){
-                navigate('/');
-                window.location.reload();
+                alert(jsonResponse.message);
+                //navigate('/');
+                //window.location.reload();
             }else{
                 setErrorPropertyUpload(jsonResponse.detail);
                 setShowErrorPropertyUpload(true);
@@ -56,6 +67,18 @@ export const PropertiesUpload = (props) => {
 
     const goBackToHome = (event) => {
       navigate('/');
+    }
+
+    const handleReUploadPhotos = async () => {
+        const hashedNames = [];
+        for ( let i=0; i<photosNamesHashed.length; i++ ){
+            await deleteFirebaseImage( photosNamesHashed[i] );
+        }
+        for ( let i=0; i<photosUpload.length; i++ ){
+            hashedNames.push(await handleUploadFirebaseImage(photosUpload[i].name, photosUpload[i]) );
+        }
+        setPhotosNamesHashed(hashedNames);
+        return photosNamesHashed;
     }
 
   return (
@@ -106,7 +129,7 @@ export const PropertiesUpload = (props) => {
                 </Container>
                 <Container className={"inputClass"}>
                     <TextField
-                        id="filled-multiline-static"
+                        id="description"
                         label="Description"
                         multiline
                         name="Description"
@@ -116,15 +139,31 @@ export const PropertiesUpload = (props) => {
                         onChange = {(event) => setDescription(event.target.value)}
                     />
                 </Container>
-                <Container className={"inputClass"}>
-                    <h1>ACA IRIA EL FILE EXPLORER QUE COMUNICARÍA Y SUBIRÍA A FIREBASE</h1>
+                <Container className={"inputClass"} style={{width:"100%"}}>
+                    <Input
+                        id="photosInput"
+                        label="Upload Photos"
+                        name="Upload Photos"
+                        value={fileInputShow}
+                        className={"inputStyle"}
+                        inputProps = {{accept: "image/*", "multiple":true}}
+                        type = "file"
+                        style={{width:"100%", marginBottom: 10}}
+                        onChange = {(event) => {setFileInputShow(event.target.value); setPhotosUpload(event.target.files)}}
+                        
+                    />
                 </Container>
-                <Container  className={"buttonClass"} maxWidth="sm">
-                    <Button type="submit" variant="contained" sx={{fontSize:16}}>Upload</Button>
-                </Container>
-                <Container  className={"buttonClass"} maxWidth="sm">
-                    <Button type="button" variant="contained" color="error" sx={{fontSize:16}} onClick={goBackToHome}>Cancel</Button>
-                </Container>
+                {loadingAsync ? 
+                    <CircularProgress/> : 
+                <>
+                    <Container  className={"buttonClass"} maxWidth="sm">
+                        <Button type="submit" variant="contained" sx={{fontSize:16}}>Upload</Button>
+                    </Container>
+                    <Container  className={"buttonClass"} maxWidth="sm">
+                        <Button type="button" variant="contained" color="error" sx={{fontSize:16}} onClick={goBackToHome}>Cancel</Button>
+                    </Container>
+                </>
+                }
             </Container>
         </form>
     </>
