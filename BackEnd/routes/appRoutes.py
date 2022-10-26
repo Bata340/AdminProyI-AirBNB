@@ -21,6 +21,8 @@ registeredProperties = {}
 
 reserveProperties = {}
 
+
+
 def removeNoneValues(dict_aux: dict):
     dict_aux2 = {}
     for key, value in dict_aux.items():
@@ -100,9 +102,9 @@ async def reserve_property(id:str, reserve: schema.ReserveProperty):
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
 
     reserveProperties[id].append(reserve)
-    return {"message": "Property with id " + id+ "was reserve between" + reserve.dateFrom + "and" + reserve.dateTo }
+    return {"message": "Property with id " + id + "was reserve between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
 
-@router.get("property/reserveDates/{id}", status_code=status.HTTP_200_OK)
+@router.get("/property/reserveDates/{id}", status_code=status.HTTP_200_OK)
 async def get_reserve_dates_for_property(id:str):
     if id not in reserveProperties.keys():
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")

@@ -1,6 +1,6 @@
 from typing import List, Optional, Union
 from pydantic import BaseModel
-
+from datetime import date
 
 
 class User(BaseModel):
@@ -34,5 +34,5 @@ class PropertyPatch(BaseModel):
     photos: Optional[List[str]] = None
 
 class ReserveProperty(BaseModel):
-    dateFrom: str
-    dateTo: str
+    dateFrom: date
+    dateTo: date
