@@ -18,12 +18,16 @@ registeredUsers['generico'] =  schema.User(
         login = False
     )
 registeredProperties = {}
+
+reserveProperties = {}
+
 def removeNoneValues(dict_aux: dict):
     dict_aux2 = {}
     for key, value in dict_aux.items():
         if value is not None:
             dict_aux2[key] = value
     return dict_aux2
+
 @router.post("/register", status_code=status.HTTP_200_OK)
 async def register(user: schema.User):
 
@@ -55,6 +59,7 @@ async def getUser(username: str):
 async def create_property(property: schema.Property):
     id = str(uuid.uuid4())
     registeredProperties[id] = property
+    reserveProperties[id] = []
     return {"message" : "register propery with id: " + id}
 
 @router.get("/property/{id}", status_code=status.HTTP_200_OK)
@@ -83,3 +88,19 @@ async def delete_property(id: str):
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
     registeredProperties.pop(id)
     return {"message": "property with id " + id + "was deleted"} 
+
+
+@router.post("/property/reserve/{id}", status_code=status.HTTP_200_OK)
+async def reserve_property(id:str, reserve: schema.ReserveProperty):
+    if id not in reserveProperties.keys():
+        return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
+
+    reserveProperties[id].append(reserve)
+    return {"message": "Property with id " + id+ "was reserve between" + reserve.dateFrom + "and" + reserve.dateTo }
+
+@router.get("property/reserveDates/{id}", status_code=status.HTTP_200_OK)
+async def get_reserve_dates_for_property(id:str):
+    if id not in reserveProperties.keys():
+        return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
+    return {"message": reserveProperties[id]}
+    

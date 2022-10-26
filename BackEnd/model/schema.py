@@ -32,3 +32,7 @@ class PropertyPatch(BaseModel):
     description: Optional[str] = None
     location: Optional[str] = None
     photos: Optional[List[str]] = None
+
+class ReserveProperty(BaseModel):
+    dateFrom: str
+    dateTo: str
