@@ -48,7 +48,7 @@ async def login(user: schema.UserLogin):
     registeredUsers[user.username].login = True
     return {"message" : "ok"}
 
-@router.get("/{username}", status_code=status.HTTP_200_OK)
+@router.get("/users/{username}", status_code=status.HTTP_200_OK)
 async def getUser(username: str):
     if username not in registeredUsers.keys():
         return HTTPException(status_code=404, detail="User with name " + username + " does not exist")
@@ -88,6 +88,10 @@ async def delete_property(id: str):
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
     registeredProperties.pop(id)
     return {"message": "property with id " + id + "was deleted"} 
+
+@router.get("/properties", status_code=status.HTTP_200_OK)
+async def get_property(): 
+    return registeredProperties
 
 
 @router.post("/property/reserve/{id}", status_code=status.HTTP_200_OK)
