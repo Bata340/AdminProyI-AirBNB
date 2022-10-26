@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from model import schema
@@ -92,7 +93,14 @@ async def delete_property(id: str):
     return {"message": "property with id " + id + "was deleted"} 
 
 @router.get("/properties", status_code=status.HTTP_200_OK)
-async def get_property(): 
+async def get_property(owner: Optional[str] = None):
+    if owner is not None: 
+        ownersProperties = []
+        for key, value in registeredProperties.items():
+            if value.owner == owner:
+                property = registeredProperties[key]
+                ownersProperties.append(property)
+        return ownersProperties
     return registeredProperties
 
 
