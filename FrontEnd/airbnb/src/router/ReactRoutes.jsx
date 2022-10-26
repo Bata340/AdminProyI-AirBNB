@@ -1,4 +1,4 @@
-import { Login, SignUp, Properties, PropertiesUpload } from '../pages';
+import { Login, SignUp, Properties, PropertiesUpload, Home } from '../pages';
 import{ BrowserRouter as Router, Routes as Switch, Route } from 'react-router-dom';
 
 function checkTokenAuth(){
@@ -20,7 +20,8 @@ function ReactRoutes() {
 	return (
 		<Router>
 			<Switch>
-				<Route exact path="/" element={<Properties/>}/>
+				<Route exact path="/" element={<Home/>}/>
+				<Route exact path="/properties" element={<Properties/>}/>
 				<Route exact path="/properties/add" element={<PropertiesUpload/>}/>
 			</Switch>
 		</Router>
