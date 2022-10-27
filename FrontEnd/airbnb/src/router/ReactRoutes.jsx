@@ -1,29 +1,24 @@
 import { Login, SignUp, Properties, PropertiesUpload } from '../pages';
+import { NavBar } from '../common/Navbar/Navbar';
 import{ BrowserRouter as Router, Routes as Switch, Route } from 'react-router-dom';
-
-function checkTokenAuth(){
-	const token = localStorage.getItem('sessionToken');
-	return (token === true || token === 'true');
-}
+import '../common/common.css';
 
 function ReactRoutes() {
-	if(!checkTokenAuth()){
-		return (
-			<Router>
+	return (
+		<>
+			<br/>
+			<br/>
+			<br/>
+			<NavBar/>
+			<Router style={{marginBottom:30}}>
 				<Switch>
-					<Route path="/" element={<Login/>}/>
+					<Route exact path="/" element={<Properties/>}/>
+					<Route path="/login" element={<Login/>}/>
 					<Route exact path="/sign-up" element={<SignUp/>}/>
+					<Route exact path="/properties/add" element={<PropertiesUpload/>}/>
 				</Switch>
 			</Router>
-		)
-	}
-	return (
-		<Router>
-			<Switch>
-				<Route exact path="/" element={<Properties/>}/>
-				<Route exact path="/properties/add" element={<PropertiesUpload/>}/>
-			</Switch>
-		</Router>
+		</>
 	);
 }
 

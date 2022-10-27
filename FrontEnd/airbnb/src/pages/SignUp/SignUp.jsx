@@ -47,7 +47,7 @@ export const SignUp = (props) => {
         if (response.status === 200){
             if(!jsonResponse.status_code){
                 localStorage.setItem("sessionToken", true);
-                localStorage.setItem("user", JSON.parse(paramsRegister.body).username);
+                localStorage.setItem("username", JSON.parse(paramsRegister.body).username);
                 navigate('/');
                 window.location.reload();
             }else{
@@ -70,10 +70,6 @@ export const SignUp = (props) => {
         setErrorSignUp('');
     }
 
-    const goBackToLogin = (event) => {
-      navigate('/');
-    }
-
   return (
     <>
         <form onSubmit = {onSubmitSignUp}>
@@ -85,7 +81,8 @@ export const SignUp = (props) => {
                     </Alert>
                 </Collapse>
                 <Container className={"LogoContainer"}>
-                    <h1>ACA EL LOGO DE NUESTRA COSA</h1>
+                    <h2>Sign Up</h2>
+                    <img src="/logo.png" alt="Logo FiubAirBnb" style={{width:150}}/>
                 </Container>
                 <Container className={"inputClass"}>
                     <TextField 
@@ -181,7 +178,7 @@ export const SignUp = (props) => {
                     <Button type="submit" variant="contained" sx={{fontSize:16}}>Sign Up</Button>
                 </Container>
                 <Container  className={"buttonClass"} maxWidth="sm">
-                    <a onClick={goBackToLogin}>Already have an account?</a>
+                    <a href='/'>Already have an account?</a>
                 </Container>
             </Container>
         </form>

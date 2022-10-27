@@ -1,0 +1,83 @@
+@import "./colors.css";
+
+ 
+
+.bg-color_custom_nav{
+    background-color: var(--bordo);
+}
+
+nav{
+    font-weight: bold;
+}
+
+nav .navbar-brand{
+    font-size: 2rem;
+}
+
+a.dropdown-toggle{
+    color: white !important; 
+}
+
+#image-logo{
+    min-width: 400px;
+}
+
+#dropdown_usuarios, #dropdown_servicios, #dropdown_cursos{
+    transition: -webkit-text-stroke   ease 0.6s;
+    
+}
+
+#dropdown_propiedades:hover, #dropdown_experiencias:hover{
+    -webkit-text-stroke: 1px var(red) !important;
+    color: var(red);
+    
+}
+
+.dropdown-menu{
+    border: 8px solid var(--gray-custom);
+    border-radius:10px;
+    border-top:0;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+}
+
+.propertyItem, .experienceItem{
+    animation: downOut 300ms ease-in-out;
+    transition: background-color ease 0.6s;
+}
+
+.propertyItem:hover{
+    background-color: var(--red-custom) !important;
+    color:white;
+    height: 100%;
+}
+
+.experienceItem:hover{
+    background-color: var(--red-custom) !important;
+    color:white;
+}
+
+#button-logout{
+    border: 10px solid #dc3545;
+    border-radius: 15px;
+    
+}
+
+#button-logout:hover{
+    border-color: #bb2d3b;
+}
+
+#button-login{
+    border: 10px solid #0D6EFD;
+    border-radius: 15px;
+}
+
+#button-login:hover{
+    border-color: #0B5ED7;
+}
+
+@media(min-width: 720px){
+    #button-logout, #button-login{
+        margin-right:10px;
+    }
+}

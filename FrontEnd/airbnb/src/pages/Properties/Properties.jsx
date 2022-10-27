@@ -51,7 +51,6 @@ export const Properties = () => {
                     console.log(jsonResponse[keys[i]])
                     arrayProps.push(jsonResponse[keys[i]]);
                 }
-                //setInmuebles(arrayProps);
                 await getImagesFromFireBase(arrayProps);
             }
         }     
@@ -60,6 +59,7 @@ export const Properties = () => {
 
     useEffect( () => {
         getProperties();
+    // eslint-disable-next-line
     }, []);
 
 

@@ -1,5 +1,4 @@
-import { Button, Container, TextField, Alert, AlertTitle, Collapse, Input, 
-    Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, CircularProgress  } from '@mui/material';
+import { Button, Container, TextField, Alert, AlertTitle, Collapse, Input, CircularProgress  } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { handleUploadFirebaseImage, deleteFirebaseImage } from '../../common/FirebaseHandler';
@@ -32,7 +31,7 @@ export const PropertiesUpload = (props) => {
             },
             body: JSON.stringify({
                 name: propertyName,
-                owner: localStorage.getItem('user'),
+                owner: localStorage.getItem('username'),
                 price: price,
                 description: description,
                 location: location,
@@ -70,7 +69,11 @@ export const PropertiesUpload = (props) => {
     const handleReUploadPhotos = async () => {
         const hashedNames = [];
         for ( let i=0; i<photosNamesHashed.length; i++ ){
-            await deleteFirebaseImage( photosNamesHashed[i] );
+            try{
+                await deleteFirebaseImage( photosNamesHashed[i] );
+            }catch(e){
+                console.log(e);
+            }
         }
         for ( let i=0; i<photosUpload.length; i++ ){
             hashedNames.push(await handleUploadFirebaseImage(photosUpload[i].name, photosUpload[i]) );
@@ -85,12 +88,12 @@ export const PropertiesUpload = (props) => {
             <Container maxWidth="sm" id="formWrapper">
                 <Collapse in={showErrorPropertyUpload}>
                     <Alert onClose={onCloseError} severity="error" id="AlertError">
-                        <AlertTitle><strong>SignUp Error</strong></AlertTitle>
+                        <AlertTitle><strong>Property Upload Error</strong></AlertTitle>
                             {errorPropertyUpload}
                     </Alert>
                 </Collapse>
                 <Container className={"LogoContainer"}>
-                    <h1>Alta de propiedad en alquiler</h1>
+                    <h1>Upload Your Property</h1>
                 </Container>
                 <Container className={"inputClass"}>
                     <TextField 

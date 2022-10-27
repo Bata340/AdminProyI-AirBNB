@@ -29,7 +29,7 @@ export const handleUploadFirebaseImage = async (name, image) => {
     const firebaseFileName = md5(name+(new Date()))+formatFile;
 
     const storageRef = ref(firebaseStorage, `files/${firebaseFileName}`);
-    const uploadTask = await uploadBytesResumable(storageRef, image);
+    await uploadBytesResumable(storageRef, image);
 
     return firebaseFileName; 
 }

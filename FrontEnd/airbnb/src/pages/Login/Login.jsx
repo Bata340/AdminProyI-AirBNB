@@ -75,7 +75,8 @@ export const Login = (props) => {
                     </Alert>
                 </Collapse>
                 <Container className={"LogoContainer"}>
-                    <h1>ACA EL LOGO DE NUESTRA COSA</h1>
+                    <h2>Login</h2>
+                    <img src="/logo.png" alt="Logo FiubAirBnb" style={{width:150}}/>
                 </Container>
                 <Container className={"inputClass"}>
                     <TextField 
