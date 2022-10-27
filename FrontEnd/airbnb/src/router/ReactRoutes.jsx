@@ -1,4 +1,4 @@
-import { Login, SignUp, Properties, PropertiesUpload } from '../pages';
+import { Login, SignUp, Properties, PropertiesUpload, MyProperties } from '../pages';
 import { NavBar } from '../common/Navbar/Navbar';
 import{ BrowserRouter as Router, Routes as Switch, Route } from 'react-router-dom';
 import '../common/common.css';
@@ -16,6 +16,14 @@ function ReactRoutes() {
 					<Route path="/login" element={<Login/>}/>
 					<Route exact path="/sign-up" element={<SignUp/>}/>
 					<Route exact path="/properties/add" element={<PropertiesUpload/>}/>
+				</Switch>
+			</Router>
+
+			<Router>
+				<Switch>
+					<Route exact path="/properties" element={<Properties/>}/>
+					<Route exact path="/properties/add" element={<PropertiesUpload/>}/>
+					<Route exact path="/properties/admin-my-props" element={<MyProperties/>}/>
 				</Switch>
 			</Router>
 		</>
