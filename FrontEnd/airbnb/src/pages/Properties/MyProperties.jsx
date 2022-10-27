@@ -70,7 +70,7 @@ export const MyProperties = () => {
                         <Grid style={{"marginTop":"2rem"}} item xs={4} key={`${prop.key}_${urlsImages[idx]}`}>
                             <MyProperty 
                                 key={`${prop.key}_${urlsImages[idx]}`}
-                                name={prop.name}AAAAAAAAAAAA 
+                                name={prop.name} 
                                 owner={prop.owner} 
                                 price={prop.price} 
                                 description={prop.description} 

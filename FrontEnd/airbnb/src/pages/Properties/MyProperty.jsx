@@ -5,12 +5,18 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import {useState} from 'react';
-import { useEffect } from 'react';
+import {useState,useEffect} from 'react';
+import {useNavigate} from 'react-router-dom';
 
 export default function MyProperty (props) {
 
   const [imageURL, setImageURL] = useState( props.photos );
+
+  let navigate = useNavigate(); 
+  const routeChange = () =>{ 
+    let path = `/properties/edit`; 
+    navigate(path);
+  }
 
   useEffect( () => {
     setImageURL(props.photos);
@@ -39,7 +45,7 @@ export default function MyProperty (props) {
       </CardContent>
       <CardActions>
         <Button size="small">${props.price}</Button>
-        <Button size="small">Editar</Button>
+        <Button size="small" onClick={routeChange}>Editar</Button>
       </CardActions>
     </Card>
   );
