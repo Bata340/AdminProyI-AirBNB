@@ -34,6 +34,18 @@ class PropertyPatch(BaseModel):
     location: Optional[str] = None
     photos: Optional[List[str]] = None
 
-class ReserveProperty(BaseModel):
+class Reservation(BaseModel):
     dateFrom: date
     dateTo: date
+
+
+class Experience(BaseModel):
+    name: str
+    owner: str
+    price: int
+    description: str 
+    location: str
+    score: int
+    photos: Union[List[str], None] = None
+    type: str
+    languages: List[str]
