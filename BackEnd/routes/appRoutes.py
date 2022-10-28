@@ -19,9 +19,30 @@ registeredUsers['generico'] =  schema.User(
         login = False
     )
 registeredProperties = {}
+registeredExperiences = {}
 
 reserveProperties = {}
+ReserveExperience = {}
 
+def filterByOwner(registryList, owner):
+    if owner is not None: 
+        ownersRegistryList = []
+        for key, value in registeredExperiences.items():
+            if value.owner == owner:
+                registry = registeredExperiences[key]
+                ownersRegistryList.append(registry)
+        return ownersRegistryList
+    return registryList
+
+def filterExperiencesByType(experiences, typeOfExperience):
+    if typeOfExperience is not None: 
+        experienceList = []
+        for key, value in experiences.items():
+            if value.type == typeOfExperience:
+                experience = experiences[key]
+                experienceList.append(experience)
+        return experienceList
+    return experiences
 
 
 def removeNoneValues(dict_aux: dict):
@@ -94,18 +115,11 @@ async def delete_property(id: str):
 
 @router.get("/properties", status_code=status.HTTP_200_OK)
 async def get_property(owner: Optional[str] = None):
-    if owner is not None: 
-        ownersProperties = []
-        for key, value in registeredProperties.items():
-            if value.owner == owner:
-                property = registeredProperties[key]
-                ownersProperties.append(property)
-        return ownersProperties
-    return registeredProperties
+    return filterByOwner(registeredProperties, owner)
 
 
 @router.post("/property/reserve/{id}", status_code=status.HTTP_200_OK)
-async def reserve_property(id:str, reserve: schema.ReserveProperty):
+async def reserve_property(id:str, reserve: schema.Reservation):
     if id not in reserveProperties.keys():
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
 
@@ -117,4 +131,27 @@ async def get_reserve_dates_for_property(id:str):
     if id not in reserveProperties.keys():
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
     return {"message": reserveProperties[id]}
+
+
+@router.get("/experiences", status_code=status.HTTP_200_OK)
+async def get_experiences(owner: Optional[str] = None, typeOfExperience: Optional[str] = None): 
+    ownersProperties = filterByOwner(registeredExperiences, owner)
+    finalExperiences = filterExperiencesByType(registeredExperiences, typeOfExperience) 
+    return registeredExperiences
     
+
+@router.post("/experience", status_code=status.HTTP_200_OK)
+async def create_experience(experience: schema.Experience):
+    id = str(uuid.uuid4())
+    registeredExperiences[id] = experience
+    reserveExperience[id] = []
+    return {"message" : "registered experience with id: " + id}
+
+
+@router.post("/experience/reserve/{id}", status_code=status.HTTP_200_OK)
+async def reserve_experience(id:str, reserve: schema.Reservation):
+    if id not in ReserveExperience.keys():
+        return HTTPException(status_code=404, detail="Experience with id " + id + " does not exist")
+
+    reserveExperiences[id].append(reserve)
+    return {"message": "Experience with id " + id + "was reserve between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
