@@ -13,17 +13,20 @@ export const MyProperties = () => {
     const [ loading, setLoading ] = useState( true );
     const [ urlsImages, setUrlsImages ] = useState( [] );
 
-    async function getImagesFromFireBase( inmuebles ){
+    async function getImagesFromFireBase( inmueblesVar ){
         const urlsArray = [];
-        for ( let i=0; i < inmuebles.length ; i++ ){
-            console.log(inmuebles[i].photos[0])
-            const url = await getFirebaseImage( 
-                `files/${inmuebles[i].photos[0]}`
-            );
-            urlsArray.push(url);
+        for ( let i=0; i < inmueblesVar.length ; i++ ){
+            const arrayURLS = [];
+            for ( let j=0; j < inmueblesVar[i].photos.length ; j++ ){
+                const url = await getFirebaseImage( 
+                    `files/${inmueblesVar[i].photos[j]}`
+                );
+                arrayURLS.push(url);
+            }
+            urlsArray.push(arrayURLS);
         }
         setUrlsImages( urlsArray );
-        setInmuebles( inmuebles );
+        setInmuebles( inmueblesVar );
         setLoading( false );
     }
 
@@ -45,11 +48,8 @@ export const MyProperties = () => {
                 const arrayProps = [];
                 const keys = Object.keys(jsonResponse);
                 for ( let i=0; i<keys.length; i++){
-                    jsonResponse[keys[i]].key = keys[i];
-                    console.log(jsonResponse[keys[i]])
                     arrayProps.push(jsonResponse[keys[i]]);
                 }
-                //setInmuebles(arrayProps);
                 await getImagesFromFireBase(arrayProps);
             }
         }     
@@ -69,6 +69,7 @@ export const MyProperties = () => {
                     return (
                         <Grid style={{"marginTop":"2rem"}} item xs={4} key={`${prop.key}_${urlsImages[idx]}`}>
                             <MyProperty 
+                                id={prop.key}
                                 key={`${prop.key}_${urlsImages[idx]}`}
                                 name={prop.name} 
                                 owner={prop.owner} 
@@ -76,7 +77,8 @@ export const MyProperties = () => {
                                 description={prop.description} 
                                 location={prop.location} 
                                 score={prop.score} 
-                                photos={ urlsImages.length > idx ? urlsImages[idx]: "" }
+                                photos={ urlsImages.length > 0 ? urlsImages[idx] : []}
+                                photosName = {prop.photos}
                             />
                         </Grid>
                     )})}

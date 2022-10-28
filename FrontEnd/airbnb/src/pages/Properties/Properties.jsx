@@ -17,7 +17,6 @@ export const Properties = () => {
     async function getImagesFromFireBase( inmuebles ){
         const urlsArray = [];
         for ( let i=0; i < inmuebles.length ; i++ ){
-            console.log(inmuebles[i].photos[0])
             const url = await getFirebaseImage( 
                 `files/${inmuebles[i].photos[0]}`
             );
@@ -47,8 +46,6 @@ export const Properties = () => {
                 const arrayProps = [];
                 const keys = Object.keys(jsonResponse);
                 for ( let i=0; i<keys.length; i++){
-                    jsonResponse[keys[i]].key = keys[i];
-                    console.log(jsonResponse[keys[i]])
                     arrayProps.push(jsonResponse[keys[i]]);
                 }
                 await getImagesFromFireBase(arrayProps);

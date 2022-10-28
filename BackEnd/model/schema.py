@@ -18,6 +18,7 @@ class UserLogin(BaseModel):
     password: str    
 
 class Property(BaseModel):
+    key: Optional[str]
     name: str
     owner: str
     price: int

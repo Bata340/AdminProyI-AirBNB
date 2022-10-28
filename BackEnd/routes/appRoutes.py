@@ -61,7 +61,16 @@ async def getUser(username: str):
 @router.post("/property/", status_code=status.HTTP_200_OK)
 async def create_property(property: schema.Property):
     id = str(uuid.uuid4())
-    registeredProperties[id] = property
+    registeredProperties[id] = schema.Property(
+        key = id, 
+        name = property.name,
+        owner = property.owner,
+        price = property.price,
+        description = property.description,
+        location = property.location,
+        score = property.score,
+        photos = property.photos
+    )
     reserveProperties[id] = []
     return {"message" : "register propery with id: " + id}
 
@@ -91,6 +100,15 @@ async def delete_property(id: str):
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
     registeredProperties.pop(id)
     return {"message": "property with id " + id + "was deleted"} 
+
+@router.delete("/property/{id_prop}/photos/{id_photo}")
+async def delete_property(id_prop: str, id_photo: str):
+    if id_prop not in registeredProperties.keys():
+        return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
+    if id_photo not in registeredProperties[id_prop].photos:
+        return HTTPException(status_code=404, detail="Photo with id " + id + " does not exist")
+    registeredProperties[id_prop].photos.pop(registeredProperties[id_prop].photos.index(id_photo))
+    return {"message": "photo with id " + id_photo + "was deleted from property with id " + id_prop } 
 
 @router.get("/properties", status_code=status.HTTP_200_OK)
 async def get_property(owner: Optional[str] = None):

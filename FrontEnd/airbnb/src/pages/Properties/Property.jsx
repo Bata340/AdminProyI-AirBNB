@@ -37,10 +37,10 @@ export default function Property (props) {
         <Typography variant="body2">
           by {props.owner} in {props.location} [{props.score}]
         </Typography>
+        <p style={{color:"blue", marginTop:"1rem"}}>
+          ${props.price}
+        </p>
       </CardContent>
-      <CardActions>
-        <Button size="small">${props.price}</Button>
-      </CardActions>
     </Card>
   );
 }
