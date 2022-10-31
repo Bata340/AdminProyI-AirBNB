@@ -1,15 +1,24 @@
-import { Button, Container, TextField, Alert, AlertTitle, Collapse, CircularProgress, Grid, Input } from '@mui/material';
+import { Button, Container, TextField, Grid } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { handleUploadFirebaseImage, deleteFirebaseImage } from '../../common/FirebaseHandler';
-//import './PropertiesEdit.css';
-import { PhotoProperty } from '../PropertiesEdit/PhotoProperty';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import { PhotoProperty } from '../PropertiesEdit/PhotoProperty';
+import Carousel from 'react-material-ui-carousel'
 
-
+const settingsSlider = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    centerMode: true,
+    variableWidth: true,
+    swipeToSlide: true,
+    edgeFriction: 0.15,
+ };
 
 export const PropertyView = (props) => {
 
@@ -32,31 +41,8 @@ export const PropertyView = (props) => {
 
     }
 
-
-
     const goBackToHome = (event) => {
       navigate('/');
-    }
-
-    const onRemoveImage = async( nameImage ) => {
-        const paramsDelete = {
-            method: "DELETE",
-            headers: {
-                'Content-Type': 'application/json',
-            }
-          };
-          const url = `${API_URL}/property/${searchParams.get("id")}/photos/${nameImage}`;
-          const response = await fetch(
-              url,
-              paramsDelete
-          );
-          const jsonResponse = await response.json();
-          if (response.status === 200){
-              if(!jsonResponse.status_code){
-                await deleteFirebaseImage( `files/${nameImage}` );
-                setPhotosNamesHashed( photosNamesHashed.filter( element => element !== nameImage ) );
-              }
-          }
     }
 
     const getDataForFields = async (id) => {
@@ -94,23 +80,30 @@ export const PropertyView = (props) => {
     <>
         <form onSubmit = {onSubmit}>
             
-            <Container    spacing={12}  sx={{ width: '80%' }} id="formWrapper">
+            <Container spacing={12}  sx={{ width: '80%' }} id="formWrapper">
 
                 <Grid container item xs={1} className={"buttonClass"} marginBottom={5}>
                         <Button type="button" variant="contained" color="error"   onClick={goBackToHome}>Back</Button>
                 </Grid>
                 <Grid container item xs={12}>
                 <Grid container item xs={6}>
-                    
-                    {
-                        photosNamesHashed.map((value) => {
-                            return(
-                            <Grid key={value} item >
-                                <PhotoProperty nameImage={value} read={true} onRemoveImage = {onRemoveImage}/>
-                            </Grid>
-                            );
-                        })
-                    }
+                    <Carousel sx={{width:"80%", margin:"auto", justifyContent:"center"}}>
+                        {
+                            photosNamesHashed.map((slideImage, index) => {
+                                return(
+                                    <Grid
+                                        key={index}
+                                        container
+                                        justify-content="center"
+                                        alignItems="center"
+                                        justifyContent="center"
+                                    >
+                                        <PhotoProperty  nameImage={slideImage} read={true} onRemoveImage = {null}/>
+                                    </Grid>
+                                );
+                            })
+                        }
+                    </Carousel>
                 </Grid>
                 
                 <Grid container item xs={5} className={"LogoContainer"} >

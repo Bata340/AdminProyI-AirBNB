@@ -4,7 +4,7 @@ import Property from './Property';
 import { getFirebaseImage } from '../../common/FirebaseHandler';
 import { useEffect, useState } from 'react';
 import {useNavigate} from 'react-router-dom';
-import Button from '@mui/material/Button';
+import "./Properties.css";
 
 
 export const Properties = () => {
@@ -74,7 +74,14 @@ export const Properties = () => {
                 
                 {inmuebles.map( (prop, idx) => {
                     return (
-                        <Grid style={{"marginTop":"2rem"}} item xs={4} key={`${prop.key}_${urlsImages[idx]}`}>
+                        <Grid 
+                            style={{"marginTop":"2rem"}} 
+                            item 
+                            xs={4} 
+                            key={`${prop.key}_${urlsImages[idx]}`} 
+                            onClick={() => {routeChange(prop)}}
+                            className = {"propertyCard"}
+                        >
                             <Property 
                                 key = {`${prop.key}_${urlsImages[idx]}`}
                                 name={prop.name} 
@@ -84,13 +91,8 @@ export const Properties = () => {
                                 location={prop.location} 
                                 score={prop.score} 
                                 photos={ urlsImages.length > idx ? urlsImages[idx]: "" }
-                            />
-                            <Grid item xs={4}>
-                                <Button size="small" onClick={() => {routeChange(prop)}} 
-                                                    variant="contained">View
-                                </Button>
                                 
-                            </Grid>
+                            />
                         </Grid>
                     )})}
             </Grid>
