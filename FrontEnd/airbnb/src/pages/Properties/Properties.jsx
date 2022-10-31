@@ -3,6 +3,8 @@ import React from 'react';
 import Property from './Property';
 import { getFirebaseImage } from '../../common/FirebaseHandler';
 import { useEffect, useState } from 'react';
+import {useNavigate} from 'react-router-dom';
+import Button from '@mui/material/Button';
 
 
 export const Properties = () => {
@@ -13,6 +15,11 @@ export const Properties = () => {
     const [ loading, setLoading ] = useState( true );
     const [ urlsImages, setUrlsImages ] = useState( [] );
 
+    let navigate = useNavigate(); 
+    const routeChange = (prop) =>{ 
+      let path = `/property?id=${prop.key}`; 
+      navigate(path);
+    }
 
     async function getImagesFromFireBase( inmuebles ){
         const urlsArray = [];
@@ -78,6 +85,12 @@ export const Properties = () => {
                                 score={prop.score} 
                                 photos={ urlsImages.length > idx ? urlsImages[idx]: "" }
                             />
+                            <Grid item xs={4}>
+                                <Button size="small" onClick={() => {routeChange(prop)}} 
+                                                    variant="contained">View
+                                </Button>
+                                
+                            </Grid>
                         </Grid>
                     )})}
             </Grid>
