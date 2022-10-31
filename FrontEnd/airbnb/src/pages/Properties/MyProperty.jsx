@@ -52,7 +52,7 @@ export default function MyProperty (props) {
 
   return (
     <>
-      <Card sx={{ maxWidth: 275 }}>
+      <Card sx={{ maxWidth: 275, height:"100%"}}>
         <CardContent>
           <Typography variant="h5" component="div">
             {props.name}

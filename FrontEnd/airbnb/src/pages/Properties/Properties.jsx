@@ -91,7 +91,6 @@ export const Properties = () => {
                                 location={prop.location} 
                                 score={prop.score} 
                                 photos={ urlsImages.length > idx ? urlsImages[idx]: "" }
-                                
                             />
                         </Grid>
                     )})}

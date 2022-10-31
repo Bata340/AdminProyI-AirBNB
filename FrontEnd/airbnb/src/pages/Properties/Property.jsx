@@ -1,11 +1,5 @@
 import * as React from 'react';
-//import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import {Card, CardContent, CardMedia, Button, Typography, Rating } from '@mui/material'
 import {useState} from 'react';
 import { useEffect } from 'react';
 
@@ -18,7 +12,7 @@ export default function Property (props) {
   }, [props.photos]);
 
   return (
-    <Card sx={{ maxWidth: 275 }}>
+    <Card sx={{ maxWidth: 275, height:"100%" }}>
       <CardContent>
         <Typography variant="h5" component="div">
           {props.name}
@@ -35,8 +29,9 @@ export default function Property (props) {
           {props.description}
         </Typography>
         <Typography variant="body2">
-          by {props.owner} in {props.location} [{props.score}]
+          by {props.owner} in {props.location}
         </Typography>
+        <Rating readOnly value={props.score || 0} name="scoreProperty"/>
         <p style={{color:"blue", marginTop:"1rem"}}>
           ${props.price}
         </p>

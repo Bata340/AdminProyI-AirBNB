@@ -185,7 +185,7 @@ export const PropertiesEdit = (props) => {
                         onChange = {(event) => setDescription(event.target.value)}
                     />
                 </Container>
-                <Grid container>
+                <Grid container spacing={2}>
                     <Grid item xs={12} sx={{textAlign:"left", textDecoration:"underline", marginTop:"0.75rem"}}>
                         <h3>Images</h3>
                     </Grid>

@@ -24,12 +24,22 @@ registeredExperiences = {}
 reserveProperties = {}
 ReserveExperience = {}
 
-def filterByOwner(registryList, owner):
+def filterExperiencesByOwner(registryList, owner):
     if owner is not None: 
         ownersRegistryList = []
         for key, value in registeredExperiences.items():
             if value.owner == owner:
                 registry = registeredExperiences[key]
+                ownersRegistryList.append(registry)
+        return ownersRegistryList
+    return registryList
+
+def filterPropertiesByOwner(registryList, owner):
+    if owner is not None: 
+        ownersRegistryList = []
+        for key, value in registeredProperties.items():
+            if value.owner == owner:
+                registry = registeredProperties[key]
                 ownersRegistryList.append(registry)
         return ownersRegistryList
     return registryList
@@ -133,7 +143,7 @@ async def delete_property(id_prop: str, id_photo: str):
 
 @router.get("/properties", status_code=status.HTTP_200_OK)
 async def get_property(owner: Optional[str] = None):
-    return filterByOwner(registeredProperties, owner)
+    return filterPropertiesByOwner(registeredProperties, owner)
 
 
 @router.post("/property/reserve/{id}", status_code=status.HTTP_200_OK)
@@ -153,7 +163,7 @@ async def get_reserve_dates_for_property(id:str):
 
 @router.get("/experiences", status_code=status.HTTP_200_OK)
 async def get_experiences(owner: Optional[str] = None, typeOfExperience: Optional[str] = None): 
-    ownersProperties = filterByOwner(registeredExperiences, owner)
+    ownersExperiences = filterExperienceByOwner(registeredExperiences, owner)
     finalExperiences = filterExperiencesByType(registeredExperiences, typeOfExperience) 
     return registeredExperiences
     

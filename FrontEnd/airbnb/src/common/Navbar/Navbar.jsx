@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function logout(){
 	localStorage.removeItem("sessionToken");
     localStorage.removeItem("user");
+    localStorage.removeItem("username");
     window.location.reload();
 }
 
