@@ -35,6 +35,8 @@ class PropertyPatch(BaseModel):
     photos: Optional[List[str]] = None
 
 class Reservation(BaseModel):
+    id: Optional[str]
+    userid: str
     dateFrom: date
     dateTo: date
 

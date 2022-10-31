@@ -23,6 +23,16 @@ registeredExperiences = {}
 
 reserveProperties = {}
 ReserveExperience = {}
+acceptedReservationProperties = {}
+
+def findReservation(reservationId, propertyId):
+    reservationlist = reserveProperties[propertyId]
+    aux = None
+    for reservation in reservationlist:
+        if reservation.id == reservationId:
+            aux = reservation
+    
+    return aux
 
 def filterExperiencesByOwner(registryList, owner):
     if owner is not None: 
@@ -103,6 +113,7 @@ async def create_property(property: schema.Property):
         photos = property.photos
     )
     reserveProperties[id] = []
+    acceptedReservationProperties[id] = []
     return {"message" : "register propery with id: " + id}
 
 @router.get("/property/{id}", status_code=status.HTTP_200_OK)
@@ -150,15 +161,31 @@ async def get_property(owner: Optional[str] = None):
 async def reserve_property(id:str, reserve: schema.Reservation):
     if id not in reserveProperties.keys():
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
-
+    reserve.id = str(uuid.uuid4())
     reserveProperties[id].append(reserve)
-    return {"message": "Property with id " + id + "was reserve between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
+    return {"message": "Reservation " + reserve.id  + " was requested  in property " + id + " between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
+
+@router.post("/users/reservation/{reservationId}", status_code=status.HTTP_200_OK)
+async def process_reservation(reservationId: str, status: str, propertyId: str):
+    reservation = findReservation(reservationId, propertyId)
+    if reservation is None: 
+        return HTTPException(status_code=404, detail="Requested Reservation with id " + reservationId + " does not exist")
+    if status == 'accepted':
+        acceptedReservationProperties[propertyId].append(reservation)
+        return {"message": "Reservation " + reservationId + " for property "+ propertyId + " was accepted"}
+    else :
+        reserveProperties[propertyId].remove(reservation)
+        return {"message": "Reservation "+ reservationId + " was cancelled"}
+    
+
+    
 
 @router.get("/property/reserveDates/{id}", status_code=status.HTTP_200_OK)
 async def get_reserve_dates_for_property(id:str):
     if id not in reserveProperties.keys():
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
     return {"message": reserveProperties[id]}
+
 
 
 @router.get("/experiences", status_code=status.HTTP_200_OK)
