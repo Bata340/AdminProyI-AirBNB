@@ -43,6 +43,9 @@ export const NavBar = () => {
                             <NavDropdown.Item href="/my-properties" className="propertyItem">
                                 Manage My Schedule
                             </NavDropdown.Item>
+                            <NavDropdown.Item href="/Properties/Requests" className="propertyItem">
+                                My Properties`s Requests
+                            </NavDropdown.Item>
                         </NavDropdown>
                     }
                     <NavDropdown
