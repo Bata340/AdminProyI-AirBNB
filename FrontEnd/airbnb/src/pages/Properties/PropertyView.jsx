@@ -1,10 +1,9 @@
-import { Button, Container, TextField, Grid, Rating } from '@mui/material';
+import { Button, Container, TextField, Grid, Rating, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { DatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
 import { PhotoProperty } from '../PropertiesEdit/PhotoProperty';
 import Carousel from 'react-material-ui-carousel'
 
@@ -23,24 +22,46 @@ const settingsSlider = {
 export const PropertyView = (props) => {
 
     const [searchParams] = useSearchParams();
-
     const [photosNamesHashed, setPhotosNamesHashed] = useState([]);
     const [reservationDates, setReservationDates] = useState([]);
     const [readonlyCheckout, setReadonlyCheckOut] = useState(true);
-
-    const [showErrorPropertyEdit, setShowErrorPropertyEdit] = useState(false);
-    const [erorPropertyEdit, setErrorPropertyEdit] = useState('');
-
-
     const [checkin, setCheckin] = useState(null);
     const [checkout, setCheckout] = useState(null);
     const [property, setProperty] = useState('');
+    const [showDialog, setShowDialog] = useState(false);
+    const [showErrorDialog, setShowErrorDialog] = useState(false);
 
     const API_URL = 'http://localhost:8000';
     const navigate = useNavigate();
 
     const onSubmit = async (event) => {
-
+        event.preventDefault();
+        if(!checkin || !checkout){
+            setShowErrorDialog(true);
+        }
+        const paramsPost = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "id":searchParams.get("id"),
+                "userid": localStorage.getItem("username"),
+                "dateFrom": checkin.toISOString().substr(0,10),
+                "dateTo": checkout.toISOString().substr(0,10)
+            })
+        };
+        const url = `${API_URL}/property/reserve/${searchParams.get("id")}`;
+        const response = await fetch(
+            url,
+            paramsPost
+        );
+        const jsonResponse = await response.json();
+        if (response.status === 200){
+            if(!jsonResponse.status_code){
+                setShowDialog(true);
+            }
+        }
     }
 
     const goBackToHome = (event) => {
@@ -55,7 +76,7 @@ export const PropertyView = (props) => {
                 'Content-Type': 'application/json',
             }
         };
-        const url = `${API_URL}/property/reserveDates/${id}`;
+        const url = `${API_URL}/property/reserveDates/${id}?type=accepted`;
         const response = await fetch(
             url,
             paramsGet
@@ -63,10 +84,18 @@ export const PropertyView = (props) => {
         const jsonResponse = await response.json();
         if (response.status === 200){
             if(!jsonResponse.status_code){
-                setReservationDates(jsonResponse.message);
-            }else{
-                setErrorPropertyEdit(jsonResponse.detail);
-                setShowErrorPropertyEdit(true);
+                const url = `${API_URL}/property/reserveDates/${id}?type=requested`;
+                const responseTwo = await fetch(
+                    url,
+                    paramsGet
+                );
+                const jsonResponseTwo = await responseTwo.json();
+                if (responseTwo.status === 200){
+                    if(!jsonResponseTwo.status_code){
+                        const reservationD = jsonResponse.message.concat(jsonResponseTwo.message);
+                        setReservationDates(reservationD);
+                    }
+                }
             }
         }
     }
@@ -90,9 +119,6 @@ export const PropertyView = (props) => {
 
                 setPhotosNamesHashed(jsonResponse.message.photos);
                 setProperty(jsonResponse.message);
-            }else{
-                setErrorPropertyEdit(jsonResponse.detail);
-                setShowErrorPropertyEdit(true);
             }
         }
     }
@@ -102,6 +128,9 @@ export const PropertyView = (props) => {
         let isInvalid = false;
         const dateFormatted = date.toISOString().substr(0,10);
         const dateToCompare = new Date(dateFormatted);
+        if( dateToCompare <= new Date()){
+            return true;
+        }
         for (let i=0; i<reservationDates.length; i++){
             const dateObject = reservationDates[i];
             const dateFrom = new Date(dateObject.dateFrom);
@@ -110,10 +139,7 @@ export const PropertyView = (props) => {
                 isInvalid = true;
                 break;
             }
-            if( dateToCompare <= new Date()){
-                isInvalid = true;
-                break;
-            }
+            
         }
         return isInvalid;
     }
@@ -145,7 +171,8 @@ export const PropertyView = (props) => {
         // Resto 1 a la fecha porque sino no me deja seleccionar el mismo dia de checkin
         const dateAsDate = new Date((checkin).toISOString());
         dateAsDate.setDate(dateAsDate.getDate()-1);
-        return ( (dateToCompare >= getMaxDateCheckout()) || (dateToCompare < dateAsDate) )
+        const maxDate = getMaxDateCheckout();
+        return ( (maxDate !== null && dateToCompare >= maxDate) || (dateToCompare < dateAsDate) )
     }
 
 
@@ -270,6 +297,48 @@ export const PropertyView = (props) => {
                 
             </Container>
         </form>
+
+        <Dialog
+            open={showDialog}
+            onClose={goBackToHome}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+            <DialogTitle id="alert-dialog-title">
+            {"Booking was succesful"}
+            </DialogTitle>
+            <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+                You have booked this property succesfully. 
+                <br/>
+                <strong>Now you just need to be accepted by the owner of the property</strong>. 
+                <br/><br/>
+                We will return you to the homepage after closing this dialog.
+            </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+            <Button onClick={() => {goBackToHome()}}>OK</Button>
+            </DialogActions>
+      </Dialog>
+
+      <Dialog
+            open={showErrorDialog}
+            onClose={() => setShowErrorDialog(false)}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+            <DialogTitle id="alert-dialog-title">
+            {"Error: Booking not completed."}
+            </DialogTitle>
+            <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+                Something went wrong with your booking. Check the Check-In and Check-Out dates in order to continue.
+            </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+            <Button onClick={() => setShowErrorDialog(false)}>OK</Button>
+            </DialogActions>
+      </Dialog>
     </>
   )
 }

@@ -24,10 +24,14 @@ export const Properties = () => {
     async function getImagesFromFireBase( inmuebles ){
         const urlsArray = [];
         for ( let i=0; i < inmuebles.length ; i++ ){
-            const url = await getFirebaseImage( 
-                `files/${inmuebles[i].photos[0]}`
-            );
-            urlsArray.push(url);
+            if(inmuebles[i].photos.length > 0){
+                const url = await getFirebaseImage( 
+                    `files/${inmuebles[i].photos[0]}`
+                );
+                urlsArray.push(url);
+            }
+            urlsArray.push("");
+            
         }
         setUrlsImages( urlsArray );
         setInmuebles( inmuebles );

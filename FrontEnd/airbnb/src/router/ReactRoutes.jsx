@@ -20,8 +20,6 @@ function ReactRoutes() {
 					<Route exact path="/properties/edit" element={<PropertiesEdit/>}/>
 					<Route exact path="/property" element={<PropertyView/>}/>
 					<Route exact path="/Properties/Requests" element={<MyPropertiesRequests/>}/>
-
-					
 				</Switch>
 			</Router>
 		</>
