@@ -150,15 +150,18 @@ async def get_property(owner: Optional[str] = None):
 async def reserve_property(id:str, reserve: schema.Reservation):
     if id not in reserveProperties.keys():
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
-
+    reserve.id = str(uuid.uuid4())
     reserveProperties[id].append(reserve)
-    return {"message": "Property with id " + id + "was reserve between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
+    return {"message": "Reservation " + reserve.id  + "was requested  in property " + id + " between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
+
+
 
 @router.get("/property/reserveDates/{id}", status_code=status.HTTP_200_OK)
 async def get_reserve_dates_for_property(id:str):
     if id not in reserveProperties.keys():
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
     return {"message": reserveProperties[id]}
+
 
 
 @router.get("/experiences", status_code=status.HTTP_200_OK)
