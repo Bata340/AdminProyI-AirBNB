@@ -29,9 +29,9 @@ export const Properties = () => {
                     `files/${inmuebles[i].photos[0]}`
                 );
                 urlsArray.push(url);
-            }
-            urlsArray.push("");
-            
+            }else{
+                urlsArray.push("");
+            }            
         }
         setUrlsImages( urlsArray );
         setInmuebles( inmuebles );
