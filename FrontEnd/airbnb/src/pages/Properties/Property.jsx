@@ -12,7 +12,7 @@ export default function Property (props) {
   }, [props.photos]);
 
   return (
-    <Card sx={{ maxWidth: 275, height:"100%" }}>
+    <Card sx={{ maxWidth: "100%", height:"100%" }}>
       <CardContent>
         <Typography variant="h5" component="div">
           {props.name}

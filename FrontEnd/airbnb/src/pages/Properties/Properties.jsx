@@ -74,7 +74,7 @@ export const Properties = () => {
     return (    
         !loading ? 
         <Container>
-            <Grid container>
+            <Grid container spacing={5}>
                 
                 {inmuebles.map( (prop, idx) => {
                     return (
