@@ -64,7 +64,7 @@ export const MyProperties = () => {
     return (    
         !loading ? 
         <Container>
-            <Grid container>
+            <Grid container spacing={5}>
                 {inmuebles.map( (prop, idx) => {
                     return (
                         <Grid style={{"marginTop":"2rem"}} item xs={4} key={`${prop.key}_${urlsImages[idx]}`}>
