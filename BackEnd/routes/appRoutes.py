@@ -44,15 +44,44 @@ def filterExperiencesByOwner(registryList, owner):
         return ownersRegistryList
     return registryList
 
-def filterPropertiesByOwner(registryList, owner):
-    if owner is not None: 
-        ownersRegistryList = []
-        for key, value in registeredProperties.items():
-            if value.owner == owner:
-                registry = registeredProperties[key]
-                ownersRegistryList.append(registry)
-        return ownersRegistryList
-    return registryList
+def filterPropertiesByOwner(propiesties, owner):
+    ownersRegistryList = []
+    for value in propiesties:
+        print(value)
+        print(owner)
+        if value.owner == owner:
+            ownersRegistryList.append(value)
+        print(value.owner)
+    return ownersRegistryList
+
+def filterPropertiesByLocation(properties, location):
+    locationPropertiesList = []
+    for value in properties:
+        print(value.location == location)
+        if value.location == location:
+            locationPropertiesList.append(value)
+    return locationPropertiesList
+
+def filterPropertiesByPrice(properties, lowerPrice, higherPrice):
+    pricePropertiesList = []
+    for value in properties:
+        if value.price >= lowerPrice and value.price<= higherPrice:
+            pricePropertiesList.append(value)
+    return pricePropertiesList
+
+def filterPropertiesByType(properties, type):
+    typePropertiesList = []
+    for value in properties:
+        if value.type == type:
+            typePropertiesList.append(value)
+    return typePropertiesList
+
+def filterPropertiesByServices(properties, services):
+    typePropertiesList = []
+    for value in properties:
+        if services in ",".join(value.services):
+            typePropertiesList.append(value)
+    return typePropertiesList
 
 def filterExperiencesByType(experiences, typeOfExperience):
     if typeOfExperience is not None: 
@@ -109,6 +138,8 @@ async def create_property(property: schema.Property):
         price = property.price,
         description = property.description,
         location = property.location,
+        type = property.type,
+        services = property.services,
         score = property.score,
         photos = property.photos
     )
@@ -153,8 +184,34 @@ async def delete_property(id_prop: str, id_photo: str):
     return {"message": "photo with id " + id_photo + "was deleted from property with id " + id_prop } 
 
 @router.get("/properties", status_code=status.HTTP_200_OK)
-async def get_property(owner: Optional[str] = None):
-    return filterPropertiesByOwner(registeredProperties, owner)
+async def get_property(filters : schema.PropertyFilters = Depends()):
+    filterProperties = [value for key , value in registeredProperties.items()]
+    if (filters.owner is not None):
+        aux = filterPropertiesByOwner(filterProperties, filters.owner)
+        filterProperties = aux
+       
+    if (filters.lowerPrice is not None and filters.highestPrice is not None):
+      
+        aux = filterPropertiesByPrice(filterProperties, filters.lowerPrice, filters.highestPrice)
+        filterProperties = aux
+       
+    if (filters.location is not None):
+       
+        aux = filterPropertiesByLocation(filterProperties, filters.location)
+        filterProperties = aux
+        
+    if (filters.type is not None):
+       
+        aux = filterPropertiesByType(filterProperties, filters.type)
+        filterProperties = aux
+      
+    if (filters.services is not None):
+       
+        aux = filterPropertiesByServices(filterProperties, filters.services)
+        filterProperties = aux
+        
+    return filterProperties
+        
 
 
 @router.post("/property/reserve/{id}", status_code=status.HTTP_200_OK)

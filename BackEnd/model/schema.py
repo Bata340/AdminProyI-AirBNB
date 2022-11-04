@@ -25,7 +25,9 @@ class Property(BaseModel):
     description: str
     location: str
     score: int
-    photos: Union[List[str], None] = None
+    type: str
+    services: Optional[List[str]] = None
+    photos: Optional[List[str]] = None
 
 class PropertyPatch(BaseModel):
     name: Optional[str] = None
@@ -51,3 +53,14 @@ class Experience(BaseModel):
     photos: Union[List[str], None] = None
     type: str
     languages: List[str]
+
+class PropertyFilters(BaseModel):
+    
+
+    owner: Optional[str] = None
+    lowerPrice: Optional[int] = None
+    highestPrice: Optional[int] = None
+    location: Optional[str] = None 
+    type: Optional[str] = None
+    services: Optional[str] = None
+    
