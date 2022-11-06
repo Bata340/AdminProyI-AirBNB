@@ -1,4 +1,4 @@
-import { Container, Grid, CircularProgress } from '@mui/material';
+import { Container, Grid, CircularProgress, TextField, Button } from '@mui/material';
 import React from 'react';
 import Property from './Property';
 import { getFirebaseImage } from '../../common/FirebaseHandler';
@@ -64,18 +64,90 @@ export const Properties = () => {
         }     
     }
 
+    const [location, setLocation] = useState('');
+    const [minPrice, setMinPrice] = useState('');
+    const [maxPrice, setMaxPrice] = useState('');
+
+    async function llamarConFiltros(){
+        const paramsUpload = {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+        const url = `${API_URL}/properties?&lowerPrice=${minPrice}&highestPrice=${maxPrice}&location=${location}`;
+        const response = await fetch(
+            url,
+            paramsUpload
+        );
+        const jsonResponse = await response.json();
+        if (response.status === 200){
+            if(!jsonResponse.status_code){
+                const arrayProps = [];
+                const keys = Object.keys(jsonResponse);
+                for ( let i=0; i<keys.length; i++){
+                    arrayProps.push(jsonResponse[keys[i]]);
+                }
+                await getImagesFromFireBase(arrayProps);
+            }
+        }     
+    }
 
     useEffect( () => {
         getProperties();
     // eslint-disable-next-line
     }, []);
 
-
     return (    
         !loading ? 
         <Container>
+            <>
+            <Container className={"inputClass"} style={{marginTop: 150}}>
+                    <h4>
+                        Filtros
+                    </h4>
+
+                    <h6>
+                        Location
+                    </h6>
+                    <TextField 
+                        label = "Location"
+                        type = "text"
+                        placeholder = "Location"
+                        name = "location"
+                        className={"inputStyle"}
+                        value={location}
+                        onChange = {(event) => setLocation(event.target.value)}
+                    />
+                    <h6>
+                        Precio
+                    </h6>
+                    <TextField 
+                        label = "Minimo"
+                        type = "text"
+                        placeholder = "Min"
+                        name = "Minimo precio"
+                        className={"inputStyle"}
+                        value={minPrice}
+                        onChange = {(event) => setMinPrice(event.target.value)}
+                        style={{width: 100, height: 50}}
+                    />
+                    <TextField 
+                        label = "Maximo"
+                        type = "text"
+                        placeholder = "Max"
+                        name = "Maximo precio"
+                        className={"inputStyle"}
+                        value={maxPrice}
+                        onChange = {(event) => setMaxPrice(event.target.value)}
+                        style={{width: 100, marginLeft: 20, height: 50}}
+                    />
+                </Container>
+                <Button id="button-filtros" variant="outlined" onClick={llamarConFiltros} style={{marginTop:20, marginLeft: 25}}>
+                        Aplicar
+                </Button>
+            </>
             <Grid container spacing={5}>
-                
                 {inmuebles.map( (prop, idx) => {
                     return (
                         <Grid 
