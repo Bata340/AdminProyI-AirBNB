@@ -39,6 +39,7 @@ class PropertyPatch(BaseModel):
 
 class Reservation(BaseModel):
     id: Optional[str]
+    propertyId: Optional[str] = None
     userid: str
     dateFrom: date
     dateTo: date
