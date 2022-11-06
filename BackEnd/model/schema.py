@@ -12,6 +12,7 @@ class User(BaseModel):
     phone_number : Union[str, None] = None
     location: str
     login: bool
+    score: Optional[int] = None
 
 class UserLogin(BaseModel):
     username: str
@@ -24,7 +25,7 @@ class Property(BaseModel):
     price: int
     description: str
     location: str
-    score: int
+    score: Optional[int] = None
     type: str
     services: Optional[List[str]] = None
     photos: Optional[List[str]] = None

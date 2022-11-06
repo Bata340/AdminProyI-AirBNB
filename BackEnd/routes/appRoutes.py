@@ -16,7 +16,8 @@ registeredUsers['generico'] =  schema.User(
         age = 30,
         phone_number = 2222-343434,
         location = "Argentina",
-        login = False
+        login = False,
+        score = 3
     )
 registeredProperties = {}
 registeredExperiences = {}
@@ -107,8 +108,10 @@ async def register(user: schema.User):
     if user.username in registeredUsers.keys():
         return HTTPException(status_code=500, detail="A user with name " + user["username"] + " already exists")
     user.login = False
+    user.score = 3
     registeredUsers[user.username] = user
     return {"message" : "registered user " +  user.username}
+
 
 
 @router.post("/login", status_code=status.HTTP_200_OK)
@@ -127,7 +130,22 @@ async def getUser(username: str):
         return HTTPException(status_code=404, detail="User with name " + username + " does not exist")
     return {"message": registeredUsers[username]}
 
+@router.patch("/users/score/{username}", status_code= status.HTTP_200_OK)
+async def add_score_to_user(username: str, score: int):
+    if username not in registeredUsers.keys():
+        return HTTPException(status_code=404, detail="User with name " + username + " does not exist")
+    aux_score = (registeredUsers[username].score + score)/ 2
+    registeredUsers[username].score = aux_score
+    return {"message": " a score " + str(score) + " was assing to user " + username}
 
+@router.patch("/property/score/{id}", status_code= status.HTTP_200_OK)
+async def add_score_to_property(id: str, score: int):
+    if id not in registeredProperties.keys():
+        return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
+    aux_score = (registeredProperties[id].score + score)/2
+    registeredProperties[id].score = aux_score 
+    return {"message": "A score " + str(score) + " was assign to property " + id}
+    
 @router.post("/property/", status_code=status.HTTP_200_OK)
 async def create_property(property: schema.Property):
     id = str(uuid.uuid4())
@@ -140,7 +158,7 @@ async def create_property(property: schema.Property):
         location = property.location,
         type = property.type,
         services = property.services,
-        score = property.score,
+        score = 3,
         photos = property.photos
     )
     requestedreserveProperties[id] = []
@@ -249,8 +267,6 @@ async def get_reserve_dates_for_property(id:str, type: str):
         return {"message": acceptedReservationProperties[id]}
 
     
-
-
 
 @router.get("/experiences", status_code=status.HTTP_200_OK)
 async def get_experiences(owner: Optional[str] = None, typeOfExperience: Optional[str] = None): 
