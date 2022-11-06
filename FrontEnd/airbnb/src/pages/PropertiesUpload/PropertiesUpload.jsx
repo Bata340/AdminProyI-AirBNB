@@ -11,6 +11,7 @@ export const PropertiesUpload = (props) => {
     const [propertyName, setPropertyName] = useState('');
     const [location, setLocation] = useState('');
     const [description, setDescription] = useState('');
+    const [type, setType] = useState('');
     const [photosNamesHashed, setPhotosNamesHashed] = useState([]);
     const [photosUpload, setPhotosUpload] = useState([]);
     const [fileInputShow, setFileInputShow] = useState("");
@@ -35,6 +36,7 @@ export const PropertiesUpload = (props) => {
                 price: price,
                 description: description,
                 location: location,
+                type: type,
                 score: 0,
                 photos: photosNames
             })
@@ -119,6 +121,17 @@ export const PropertiesUpload = (props) => {
                         className={"inputStyle"}
                         value={location}
                         onChange = {(event) => setLocation(event.target.value)}
+                    />
+                </Container>
+                <Container className={"inputClass"}>
+                    <TextField 
+                        label = "Type"
+                        type = "text"
+                        placeholder = "Type"
+                        name = "Type"
+                        className={"inputStyle"}
+                        value={type}
+                        onChange = {(event) => setType(event.target.value)}
                     />
                 </Container>
                 <Container className={"inputClass"}>
