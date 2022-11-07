@@ -409,3 +409,18 @@ async def get_users_to_review(owner_id: str):
             if ((user_ids.count(reservation.userid) == 0) and (not any(userRev.get("user", None) == reservation.userid for userRev in userReviews[owner_id]))):
                 user_ids.append(reservation.userid)
     return user_ids
+
+
+@router.get("/reviews/get-properties-to-review/{user_id}", status_code=status.HTTP_200_OK)
+async def get_users_to_review(user_id: str):
+    propertiesToReturn = []
+    for keyProp in acceptedReservationProperties:
+        reservationsInProp = acceptedReservationProperties[keyProp]
+        reservationsFiltered = filter(
+            lambda reservation: reservation.userid == user_id and reservation.dateTo < datetime.date.today(),
+            reservationsInProp
+        )
+        for reservation in reservationsFiltered:
+            if not any(prop.get("key", None) == reservation.propertyId for prop in propertiesToReturn):
+                propertiesToReturn.append({"key": reservation.propertyId, "property": registeredProperties[reservation.propertyId]})
+    return propertiesToReturn
