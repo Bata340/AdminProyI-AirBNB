@@ -113,7 +113,8 @@ export const MyPropertiesRequests = () => {
                   owner={inmueble.owner}
                   price={inmueble.price}
                   user={prop.userid}
-                  userScore={4} /*{prop.userScore}*/
+                  userScore={prop.userScore}
+                  userNumOfVotes = {prop.numberOfOpinionsUser}
                   checkin={`${dateFrom.getDate()}/${
                     dateFrom.getMonth() + 1
                   }/${dateFrom.getFullYear()}`}

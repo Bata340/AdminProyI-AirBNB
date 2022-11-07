@@ -101,6 +101,7 @@ export default function PropertyRequest (props) {
                   <Grid item xs={6} >
                     <h4 style={{marginRight:"1rem"}}>User Opinions: </h4>
                     <Rating value={props.userScore} readOnly/>
+                    <Typography>{props.userNumOfVotes} opinion{props.userNumOfVotes !== 1? "s" : null}</Typography>
                       
                   </Grid>
                   

@@ -6,3 +6,5 @@ export * from './Properties/MyProperties';
 export * from './PropertiesEdit/PropertiesEdit';
 export * from './Properties/PropertyView';
 export * from './PropertiesRequests/MyPropertiesRequests';
+export * from './ReviewUsers/ReviewUsers';
+export * from './ReviewProperties/ReviewProperties';

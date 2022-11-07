@@ -75,7 +75,7 @@ export const Properties = () => {
                 'Content-Type': 'application/json',
             }
         };
-        let url = `${API_URL}/properties?`;//&lowerPrice=${minPrice}&highestPrice=${maxPrice}&location=${location}`;
+        let url = `${API_URL}/properties?`;
         let paramsObject = {};
         if(minPrice !== ""){
             paramsObject["lowerPrice"] = minPrice;
@@ -193,6 +193,7 @@ export const Properties = () => {
                                 description={prop.description} 
                                 location={prop.location} 
                                 score={prop.score} 
+                                numOfVotes={prop.numOfVotes}
                                 photos={ urlsImages.length > idx ? urlsImages[idx]: "" }
                             />
                         </Grid>

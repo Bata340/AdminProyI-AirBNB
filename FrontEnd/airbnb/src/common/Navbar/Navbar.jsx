@@ -70,6 +70,19 @@ export const NavBar = () => {
                             </>
                         }
                     </NavDropdown>
+                    {isLoggedIn() && 
+                    <NavDropdown
+                    className="mx-3"
+                    title="Reviews"
+                    id="dropdown_reviews"
+                    >
+                        <NavDropdown.Item href="/reviews/occupants" className="experienceItem">
+                            Review Occupants
+                        </NavDropdown.Item>
+                        <NavDropdown.Item href="/reviews/properties" className="experienceItem">
+                            Review Properties
+                        </NavDropdown.Item>
+                    </NavDropdown>}
                 </Nav>
                 <Nav className="ms-auto">
                     {isLoggedIn() ? 

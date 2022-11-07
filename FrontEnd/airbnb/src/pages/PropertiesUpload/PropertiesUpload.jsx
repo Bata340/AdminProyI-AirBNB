@@ -37,7 +37,7 @@ export const PropertiesUpload = (props) => {
                 description: description,
                 location: location,
                 type: type,
-                score: 0,
+                score: [],
                 photos: photosNames
             })
         };

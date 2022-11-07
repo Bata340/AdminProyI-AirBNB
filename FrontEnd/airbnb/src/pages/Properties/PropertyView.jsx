@@ -1,4 +1,4 @@
-import { Button, Container, TextField, Grid, Rating, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { Button, Container, TextField, Grid, Rating, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -234,6 +234,7 @@ export const PropertyView = (props) => {
                     <Grid container item xs={12} sx={{marginTop:"1.5rem"}}>
                         <Container sx={{textAlign:"left"}}>
                             <Rating readOnly value={property.score || 0} name="scoreProperty"/>
+                            <Typography>{property.numOfVotes} opinion{props.numOfVotes !== 1? "s" : null}</Typography>
                         </Container>
                     </Grid> 
                     

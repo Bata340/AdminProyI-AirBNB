@@ -12,6 +12,7 @@ export const PropertiesEdit = (props) => {
     const [price, setPrice] = useState(0);
     const [propertyName, setPropertyName] = useState('');
     const [location, setLocation] = useState('');
+    const [type, setType] = useState('');
     const [description, setDescription] = useState('');
     const [photosNamesHashed, setPhotosNamesHashed] = useState([]);
     const [photosUpload, setPhotosUpload] = useState([]);
@@ -107,6 +108,7 @@ export const PropertiesEdit = (props) => {
                 setLocation(jsonResponse.message.location);
                 setDescription(jsonResponse.message.description);
                 setPhotosNamesHashed(jsonResponse.message.photos);
+                setType(jsonResponse.message.type);
             }else{
                 setErrorPropertyEdit(jsonResponse.detail);
                 setShowErrorPropertyEdit(true);
@@ -171,6 +173,17 @@ export const PropertiesEdit = (props) => {
                         className={"inputStyle"}
                         value={location}
                         onChange = {(event) => setLocation(event.target.value)}
+                    />
+                </Container>
+                <Container className={"inputClass"}>
+                    <TextField 
+                        label = "Type"
+                        type = "text"
+                        placeholder = "Type"
+                        name = "Type"
+                        className={"inputStyle"}
+                        value={type}
+                        onChange = {(event) => setType(event.target.value)}
                     />
                 </Container>
                 <Container className={"inputClass"}>

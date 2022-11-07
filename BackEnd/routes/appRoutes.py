@@ -3,6 +3,8 @@ from fastapi import APIRouter
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from model import schema
 import uuid
+import functools
+import datetime
 
 
 router = APIRouter()
@@ -17,7 +19,7 @@ registeredUsers['generico'] =  schema.User(
         phone_number = 2222-343434,
         location = "Argentina",
         login = False,
-        score = 3
+        score = [3]
     )
 registeredProperties = {}
 registeredExperiences = {}
@@ -25,6 +27,8 @@ registeredExperiences = {}
 requestedreserveProperties = {}
 ReserveExperience = {}
 acceptedReservationProperties = {}
+userReviews = {"generico": []}
+propertiesReviews = {"generico": []}
 
 def findReservation(reservationId, propertyId):
     reservationlist = requestedreserveProperties[propertyId]
@@ -115,8 +119,10 @@ async def register(user: schema.User):
     if user.username in registeredUsers.keys():
         return HTTPException(status_code=500, detail="A user with name " + user["username"] + " already exists")
     user.login = False
-    user.score = 3
+    user.score = []
     registeredUsers[user.username] = user
+    userReviews[user.username] = []
+    propertiesReviews[user.username] = []
     return {"message" : "registered user " +  user.username}
 
 
@@ -138,19 +144,21 @@ async def getUser(username: str):
     return {"message": registeredUsers[username]}
 
 @router.patch("/users/score/{username}", status_code= status.HTTP_200_OK)
-async def add_score_to_user(username: str, score: int):
+async def add_score_to_user(owner_user:str, username: str, score: int):
     if username not in registeredUsers.keys():
         return HTTPException(status_code=404, detail="User with name " + username + " does not exist")
-    aux_score = (registeredUsers[username].score + score)/ 2
-    registeredUsers[username].score = aux_score
-    return {"message": " a score " + str(score) + " was assing to user " + username}
+    if any(userRev.get("user", None) == username for userRev in userReviews[owner_user]):
+        return HTTPException(status_code=500, detail="User with name " + username + " has already been scored by "+ owner_user+".")
+    registeredUsers[username].score.append(score)
+    userReviews[owner_user].append({"user": username, "score":score})
+    return {"message": "A score of " + str(score) + " was assinged to the user " + username}
 
 @router.patch("/property/score/{id}", status_code= status.HTTP_200_OK)
-async def add_score_to_property(id: str, score: int):
+async def add_score_to_property(owner_user: str, id: str, score: int):
     if id not in registeredProperties.keys():
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
-    aux_score = (registeredProperties[id].score + score)/2
-    registeredProperties[id].score = aux_score 
+    registeredProperties[id].score.append(score) 
+    propertiesReviews[owner_user].append({"property": id, "score":score})
     return {"message": "A score " + str(score) + " was assign to property " + id}
     
 @router.post("/property/", status_code=status.HTTP_200_OK)
@@ -165,7 +173,7 @@ async def create_property(property: schema.Property):
         location = property.location,
         type = property.type,
         services = property.services,
-        score = 3,
+        score = [],
         photos = property.photos
     )
     requestedreserveProperties[id] = []
@@ -176,8 +184,23 @@ async def create_property(property: schema.Property):
 async def getProperty(id: str):
     if id not in registeredProperties.keys():
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
-    
-    return {"message": registeredProperties[id]}
+    prop_score = 0
+    if len(registeredProperties[id].score) > 0:
+        prop_score = functools.reduce(lambda a,b: a+b, registeredProperties[id].score)/len(registeredProperties[id].score)
+    return_message = {
+        "key": registeredProperties[id].key,
+        "name": registeredProperties[id].name,
+        "owner": registeredProperties[id].owner,
+        "price": registeredProperties[id].price,
+        "description": registeredProperties[id].description,
+        "location": registeredProperties[id].location,
+        "score": prop_score,
+        "numOfVotes": len(registeredProperties[id].score),
+        "type": registeredProperties[id].type,
+        "services": registeredProperties[id].services,
+        "photos": registeredProperties[id].photos
+    }
+    return {"message": return_message}
 
 
 @router.patch("/property/{id}", status_code=status.HTTP_200_OK)
@@ -238,8 +261,29 @@ async def get_property(filters : schema.PropertyFilters = Depends()):
        
         aux = filterPropertiesByServices(filterProperties, filters.services)
         filterProperties = aux
-        
-    return filterProperties
+    
+    return_message = []
+    for prop in filterProperties:
+        prop_score = 0
+        if len(prop.score) > 0:
+            prop_score = functools.reduce(lambda a,b: a+b, prop.score)/len(prop.score)
+        return_message.append(
+            {
+                "key": prop.key,
+                "name": prop.name,
+                "owner": prop.owner,
+                "price": prop.price,
+                "description": prop.description,
+                "location": prop.location,
+                "score": prop_score,
+                "numOfVotes": len(prop.score),
+                "type": prop.type,
+                "services": prop.services,
+                "photos": prop.photos
+            }
+        )
+
+    return return_message
         
 
 
@@ -282,17 +326,57 @@ async def get_reserve_dates_for_property(id:str, type: str):
     if type == "requested":
         if id not in requestedreserveProperties.keys():
             return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
-        return {"message": requestedreserveProperties[id]}
+        final_return = []
+        for bookingRequest in requestedreserveProperties[id]:
+            userScore = 0
+            if len(registeredUsers[bookingRequest.userid].score) > 0:
+                userScore = functools.reduce(
+                    lambda a,b: 
+                        a + b, 
+                        registeredUsers[bookingRequest.userid].score
+                )
+                userScore = int(userScore / len(registeredUsers[bookingRequest.userid].score))
+            return_message = {
+                "id": bookingRequest.id,
+                "propertyId": bookingRequest.propertyId,
+                "userid": bookingRequest.userid,
+                "userScore": userScore,
+                "numberOfOpinionsUser": len(registeredUsers[bookingRequest.userid].score),
+                "dateFrom": bookingRequest.dateFrom,
+                "dateTo": bookingRequest.dateTo
+            }
+            final_return.append(return_message)
+        return {"message": final_return}
     else:
         if id not in acceptedReservationProperties.keys():
             return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
-        return {"message": acceptedReservationProperties[id]}
+        final_return = []
+        for bookingRequest in acceptedReservationProperties[id]:
+            userScore = 0
+            if len(registeredUsers[bookingRequest.userid].score) > 0:
+                userScore = functools.reduce(
+                    lambda a,b: 
+                        a + b, 
+                        registeredUsers[bookingRequest.userid].score
+                )
+                userScore = int(userScore / len(registeredUsers[bookingRequest.userid].score))
+            return_message = {
+                "id": bookingRequest.id,
+                "propertyId": bookingRequest.propertyId,
+                "userid": bookingRequest.userid,
+                "userScore": userScore,
+                "numberOfOpinionsUser": len(registeredUsers[bookingRequest.userid].score),
+                "dateFrom": bookingRequest.dateFrom,
+                "dateTo": bookingRequest.dateTo
+            }
+            final_return.append(return_message)
+        return {"message": final_return}
 
     
 
 @router.get("/experiences", status_code=status.HTTP_200_OK)
 async def get_experiences(owner: Optional[str] = None, typeOfExperience: Optional[str] = None): 
-    ownersExperiences = filterExperienceByOwner(registeredExperiences, owner)
+    ownersExperiences = filterExperiencesByOwner(registeredExperiences, owner)
     finalExperiences = filterExperiencesByType(registeredExperiences, typeOfExperience) 
     return registeredExperiences
     
@@ -312,3 +396,16 @@ async def reserve_experience(id:str, reserve: schema.Reservation):
 
     reserveExperiences[id].append(reserve)
     return {"message": "Experience with id " + id + "was reserve between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
+
+
+@router.get("/reviews/get-users-to-review/{owner_id}", status_code=status.HTTP_200_OK)
+async def get_users_to_review(owner_id: str):
+    props_from_owner = filter(lambda keyProp: registeredProperties[keyProp].owner == owner_id, registeredProperties)
+    user_ids = []
+    for keyProp in props_from_owner:
+        reservationsAccepted = acceptedReservationProperties[keyProp]
+        reservationsFinished = filter(lambda reservation: reservation.dateTo < datetime.date.today(), reservationsAccepted)
+        for reservation in reservationsFinished:
+            if ((user_ids.count(reservation.userid) == 0) and (not any(userRev.get("user", None) == reservation.userid for userRev in userReviews[owner_id]))):
+                user_ids.append(reservation.userid)
+    return user_ids

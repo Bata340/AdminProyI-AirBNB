@@ -32,6 +32,7 @@ export default function Property (props) {
           by {props.owner} in {props.location}
         </Typography>
         <Rating readOnly value={props.score || 0} name="scoreProperty"/>
+        <Typography>{props.numOfVotes} opinion{props.numOfVotes !== 1? "s" : null}</Typography>
         <p style={{color:"blue", marginTop:"1rem"}}>
           ${props.price}
         </p>
