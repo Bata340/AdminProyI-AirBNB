@@ -65,23 +65,30 @@ export const MyProperties = () => {
         !loading ? 
         <Container>
             <Grid container spacing={5}>
-                {inmuebles.map( (prop, idx) => {
-                    return (
-                        <Grid style={{"marginTop":"2rem"}} item xs={4} key={`${prop.key}_${urlsImages[idx]}`}>
-                            <MyProperty 
-                                id={prop.key}
-                                key={`${prop.key}_${urlsImages[idx]}`}
-                                name={prop.name} 
-                                owner={prop.owner} 
-                                price={prop.price} 
-                                description={prop.description} 
-                                location={prop.location} 
-                                score={prop.score} 
-                                photos={ urlsImages.length > 0 ? urlsImages[idx] : []}
-                                photosName = {prop.photos}
-                            />
-                        </Grid>
-                    )})}
+                {console.log(inmuebles.length)}
+                {inmuebles.length > 0 ? 
+                    inmuebles.map( (prop, idx) => {
+                        return (
+                            <Grid style={{"marginTop":"2rem"}} item xs={4} key={`${prop.key}_${urlsImages[idx]}`}>
+                                <MyProperty 
+                                    id={prop.key}
+                                    key={`${prop.key}_${urlsImages[idx]}`}
+                                    name={prop.name} 
+                                    owner={prop.owner} 
+                                    price={prop.price} 
+                                    description={prop.description} 
+                                    location={prop.location} 
+                                    score={prop.score} 
+                                    photos={ urlsImages.length > 0 ? urlsImages[idx] : []}
+                                    photosName = {prop.photos}
+                                />
+                            </Grid>
+                        )
+                    }) : 
+                    <Grid style={{marginTop:"3rem", textAlign:"center"}} item xs={12}>
+                        <h4>You have no properties uploaded yet.</h4>
+                    </Grid>
+                }
             </Grid>
         </Container>
         : <CircularProgress 

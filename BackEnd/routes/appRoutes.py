@@ -63,10 +63,17 @@ def filterPropertiesByLocation(properties, location):
             locationPropertiesList.append(value)
     return locationPropertiesList
 
-def filterPropertiesByPrice(properties, lowerPrice, higherPrice):
+def filterPropertiesByLowestPrice(properties, lowestPrice):
     pricePropertiesList = []
     for value in properties:
-        if value.price >= lowerPrice and value.price<= higherPrice:
+        if value.price >= lowestPrice:
+            pricePropertiesList.append(value)
+    return pricePropertiesList
+
+def filterPropertiesByHighestPrice(properties, highestPrice):
+    pricePropertiesList = []
+    for value in properties:
+        if value.price <= highestPrice:
             pricePropertiesList.append(value)
     return pricePropertiesList
 
@@ -208,9 +215,13 @@ async def get_property(filters : schema.PropertyFilters = Depends()):
         aux = filterPropertiesByOwner(filterProperties, filters.owner)
         filterProperties = aux
        
-    if (filters.lowerPrice is not None and filters.highestPrice is not None):
+    if (filters.lowerPrice is not None):
       
-        aux = filterPropertiesByPrice(filterProperties, filters.lowerPrice, filters.highestPrice)
+        aux = filterPropertiesByLowestPrice(filterProperties, filters.lowerPrice)
+        filterProperties = aux
+
+    if (filters.highestPrice is not None):
+        aux = filterPropertiesByHighestPrice(filterProperties, filters.highestPrice)
         filterProperties = aux
        
     if (filters.location is not None):

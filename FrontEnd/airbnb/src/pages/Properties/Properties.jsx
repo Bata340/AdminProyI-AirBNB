@@ -1,4 +1,4 @@
-import { Container, Grid, CircularProgress, TextField, Button } from '@mui/material';
+import { Container, Grid, CircularProgress, TextField, Button, InputAdornment } from '@mui/material';
 import React from 'react';
 import Property from './Property';
 import { getFirebaseImage } from '../../common/FirebaseHandler';
@@ -75,7 +75,18 @@ export const Properties = () => {
                 'Content-Type': 'application/json',
             }
         };
-        const url = `${API_URL}/properties?&lowerPrice=${minPrice}&highestPrice=${maxPrice}&location=${location}`;
+        let url = `${API_URL}/properties?`;//&lowerPrice=${minPrice}&highestPrice=${maxPrice}&location=${location}`;
+        let paramsObject = {};
+        if(minPrice !== ""){
+            paramsObject["lowerPrice"] = minPrice;
+        }
+        if(maxPrice !== ""){
+            paramsObject["highestPrice"] = maxPrice;
+        }
+        if(location !== ""){
+            paramsObject["location"] = location;
+        }
+        url += new URLSearchParams(paramsObject);
         const response = await fetch(
             url,
             paramsUpload
@@ -100,52 +111,68 @@ export const Properties = () => {
 
     return (    
         !loading ? 
-        <Container>
+        <Container >
             <>
-            <Container className={"inputClass"} style={{marginTop: 150}}>
-                    <h4>
-                        Filtros
-                    </h4>
-
-                    <h6>
-                        Location
-                    </h6>
-                    <TextField 
-                        label = "Location"
-                        type = "text"
-                        placeholder = "Location"
-                        name = "location"
-                        className={"inputStyle"}
-                        value={location}
-                        onChange = {(event) => setLocation(event.target.value)}
-                    />
-                    <h6>
-                        Precio
-                    </h6>
-                    <TextField 
-                        label = "Minimo"
-                        type = "text"
-                        placeholder = "Min"
-                        name = "Minimo precio"
-                        className={"inputStyle"}
-                        value={minPrice}
-                        onChange = {(event) => setMinPrice(event.target.value)}
-                        style={{width: 100, height: 50}}
-                    />
-                    <TextField 
-                        label = "Maximo"
-                        type = "text"
-                        placeholder = "Max"
-                        name = "Maximo precio"
-                        className={"inputStyle"}
-                        value={maxPrice}
-                        onChange = {(event) => setMaxPrice(event.target.value)}
-                        style={{width: 100, marginLeft: 20, height: 50}}
-                    />
+            <Container className={"inputClass"} style={{marginTop: 50}}>
+                    <Grid container style={{border:"1px solid black", borderRadius:"10px", padding:"1rem"}}>
+                        <Grid item xs={12}>
+                        <h4>
+                            Filtros
+                        </h4>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <h6>
+                                Location
+                            </h6>
+                            <TextField 
+                                label = "Location"
+                                type = "text"
+                                placeholder = "Location"
+                                name = "location"
+                                className={"inputStyle"}
+                                value={location}
+                                onChange = {(event) => setLocation(event.target.value)}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <h6>
+                                Precio
+                            </h6>
+                            <TextField 
+                                label = "Minimo"
+                                type = "text"
+                                placeholder = "Min"
+                                name = "Minimo precio"
+                                className={"inputStyle"}
+                                value={minPrice}
+                                onChange = {(event) => setMinPrice(event.target.value)}
+                                style={{width: 150, height: 50}}
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start">U$D</InputAdornment>,
+                                }}
+                            />
+                            <TextField 
+                                label = "Maximo"
+                                type = "text"
+                                placeholder = "Max"
+                                name = "Maximo precio"
+                                className={"inputStyle"}
+                                value={maxPrice}
+                                onChange = {(event) => setMaxPrice(event.target.value)}
+                                style={{width: 150, marginLeft: 20, height: 50}}
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start">U$D</InputAdornment>,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={2}>
+                            <Button id="button-filtros" variant="outlined" onClick={llamarConFiltros} style={{marginTop:20, marginLeft: 25}}>
+                                Aplicar
+                            </Button>
+                        </Grid>
+                    </Grid>
                 </Container>
-                <Button id="button-filtros" variant="outlined" onClick={llamarConFiltros} style={{marginTop:20, marginLeft: 25}}>
-                        Aplicar
-                </Button>
+                
             </>
             <Grid container spacing={5}>
                 {inmuebles.map( (prop, idx) => {
