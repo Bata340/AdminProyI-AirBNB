@@ -68,7 +68,8 @@ export const ReviewProperties = () => {
     <Container style={{marginTop:"3rem"}}>
         <h1 style={{textDecoration:"underline"}}>Review Properties</h1>
         <Grid container >
-          {propertiesToReview.map(property => {
+          {propertiesToReview.length > 0 ?
+          propertiesToReview.map(property => {
             return(
               <Grid 
                 item container justifyContent="center" alignItems="center" xs={12} md={3}
@@ -88,7 +89,11 @@ export const ReviewProperties = () => {
                 </Grid>
               </Grid>
             )
-          })}
+          }): 
+          <Grid item container justifyContent="center" alignItems="center" xs={12} style={{marginTop:"1rem"}}>
+            <h4 style={{textAlign:"center"}}>You have no properties to review yet. First you have to finish a reservation in a property.</h4>
+          </Grid>
+          }
         </Grid>
         <Dialog
           open={showDialog}

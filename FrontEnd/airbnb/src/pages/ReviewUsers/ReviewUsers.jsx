@@ -68,7 +68,8 @@ export const ReviewUsers = () => {
     <Container style={{marginTop:"3rem"}}>
         <h1 style={{textDecoration:"underline"}}>Review Occupants</h1>
         <Grid container >
-          {usersToReview.map(user => {
+          {usersToReview.length > 0 ?
+          usersToReview.map(user => {
             return(
               <Grid 
                 item container justifyContent="center" alignItems="center" xs={12} md={3}
@@ -88,7 +89,11 @@ export const ReviewUsers = () => {
                 </Grid>
               </Grid>
             )
-          })}
+          }): 
+          <Grid item container justifyContent="center" alignItems="center" xs={12} style={{marginTop:"1rem"}}>
+            <h4 style={{textAlign:"center"}}>You have no users to review yet. First you have to finish a reservation in a published property.</h4>
+          </Grid>
+        }
         </Grid>
         <Dialog
           open={showDialog}
