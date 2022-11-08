@@ -58,7 +58,7 @@ export const ReviewProperties = () => {
         if(!jsonResponse.status_code){
           setDataDialog({"propertyName":property.property.name, "score":scores[property.key]});
           setShowDialog(true);
-          setPropertiesToReview(propertiesToReview.filter(propInArray => propInArray.key != property.key));
+          setPropertiesToReview(propertiesToReview.filter(propInArray => propInArray.key !== property.key));
         }
     }
   }

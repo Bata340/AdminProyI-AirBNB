@@ -58,7 +58,7 @@ export const ReviewUsers = () => {
         if(!jsonResponse.status_code){
           setDataDialog({"user":user, "score":scores[user]});
           setShowDialog(true);
-          setUsersToReview(usersToReview.filter(userInArray => userInArray != user));
+          setUsersToReview(usersToReview.filter(userInArray => userInArray !== user));
         }
     }
   }
