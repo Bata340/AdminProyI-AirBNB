@@ -25,7 +25,7 @@ registeredProperties = {}
 registeredExperiences = {}
 
 requestedreserveProperties = {}
-ReserveExperience = {}
+reservedExperience = {}
 acceptedReservationProperties = {}
 userReviews = {"generico": []}
 propertiesReviews = {"generico": []}
@@ -385,16 +385,16 @@ async def get_experiences(owner: Optional[str] = None, typeOfExperience: Optiona
 async def create_experience(experience: schema.Experience):
     id = str(uuid.uuid4())
     registeredExperiences[id] = experience
-    reserveExperience[id] = []
+    reservedExperience[id] = []
     return {"message" : "registered experience with id: " + id}
 
 
 @router.post("/experience/reserve/{id}", status_code=status.HTTP_200_OK)
 async def reserve_experience(id:str, reserve: schema.Reservation):
-    if id not in ReserveExperience.keys():
+    if id not in ReservedExperience.keys():
         return HTTPException(status_code=404, detail="Experience with id " + id + " does not exist")
 
-    reserveExperiences[id].append(reserve)
+    reservedExperiences[id].append(reserve)
     return {"message": "Experience with id " + id + "was reserve between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
 
 

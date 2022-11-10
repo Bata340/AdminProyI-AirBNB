@@ -51,7 +51,7 @@ class Experience(BaseModel):
     price: int
     description: str 
     location: str
-    score: int
+    score: Optional[List[int]] = None
     photos: Union[List[str], None] = None
     type: str
     languages: List[str]
