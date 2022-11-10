@@ -1,15 +1,10 @@
-import React from "react";
+import { useState, useEffect } from "react";
 
 import { Navbar, Nav, NavDropdown, Button } from "react-bootstrap";
 import "./Navbar.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function logout(){
-	localStorage.removeItem("sessionToken");
-    localStorage.removeItem("user");
-    localStorage.removeItem("username");
-    window.location.reload();
-}
+
 
 function isLoggedIn(){
     return (
@@ -19,6 +14,27 @@ function isLoggedIn(){
 }
 
 export const NavBar = () => {
+
+    const [isLoggedInSt, setIsLoggedInSt] = useState(isLoggedIn());
+
+    const logout = () => {
+        localStorage.removeItem("sessionToken");
+        localStorage.removeItem("user");
+        localStorage.removeItem("username");
+        window.location.reload();
+    }
+
+
+    useEffect(() => {
+        const handleStorage = () => {
+            setIsLoggedInSt(isLoggedIn());
+        }
+    
+        window.addEventListener('storage', handleStorage);
+        return () => window.removeEventListener('storage', handleStorage());
+    }, []);
+
+
 	return (
 		<div className="fixed-top">
             <Navbar bg="color_custom_nav" expand="lg">
@@ -28,7 +44,7 @@ export const NavBar = () => {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" style={{marginRight:'2rem'}}/>
                 <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">
-                    {isLoggedIn() && 
+                    {isLoggedInSt && 
                         <NavDropdown
                         className="mx-3"
                         title="Properties"
@@ -56,7 +72,7 @@ export const NavBar = () => {
                         <NavDropdown.Item href="/experiences" className="experienceItem">
                             Search Experiences
                         </NavDropdown.Item>
-                        {isLoggedIn() && 
+                        {isLoggedInSt && 
                             <>
                                 <NavDropdown.Item href="/experiences/add" className="experienceItem">
                                     Add An Experience
@@ -70,7 +86,7 @@ export const NavBar = () => {
                             </>
                         }
                     </NavDropdown>
-                    {isLoggedIn() && 
+                    {isLoggedInSt && 
                     <NavDropdown
                     className="mx-3"
                     title="Reviews"
@@ -85,7 +101,7 @@ export const NavBar = () => {
                     </NavDropdown>}
                 </Nav>
                 <Nav className="ms-auto">
-                    {isLoggedIn() ? 
+                    {isLoggedInSt ? 
                         <Button id="button-logout" variant="danger" onClick = {logout}>
                             <strong>Logout</strong>
                         </Button>
