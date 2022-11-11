@@ -16,6 +16,8 @@ function isLoggedIn(){
 export const NavBar = () => {
 
     const [isLoggedInSt, setIsLoggedInSt] = useState(isLoggedIn());
+    const [money, setMoney] = useState(0);
+    const API_URL = 'http://localhost:8000';
 
     const logout = () => {
         localStorage.removeItem("sessionToken");
@@ -29,9 +31,39 @@ export const NavBar = () => {
         const handleStorage = () => {
             setIsLoggedInSt(isLoggedIn());
         }
+
+        const retrieveMoney = async () => {
+            const paramsGet = {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            };
+            const url = `${API_URL}/users/${localStorage.getItem("username")}`;
+            const response = await fetch(
+                url,
+                paramsGet
+            );
+            const jsonResponse = await response.json();
+            if (response.status === 200){
+                if(!jsonResponse.status_code){
+                    console.log(jsonResponse);
+                    setMoney(jsonResponse.message.money);
+                }
+            }
+        }
+
+        setIsLoggedInSt(isLoggedIn());
+        if(isLoggedInSt){
+            retrieveMoney();
+        }
     
         window.addEventListener('storage', handleStorage);
-        return () => window.removeEventListener('storage', handleStorage());
+        window.addEventListener('payment', retrieveMoney);
+        return () => {
+            window.removeEventListener('storage', handleStorage); 
+            window.removeEventListener('payment', retrieveMoney);
+        };
     }, []);
 
 
@@ -56,7 +88,7 @@ export const NavBar = () => {
                             <NavDropdown.Item href="/properties/admin-my-props" className="propertyItem">
                                 Manage My Properties
                             </NavDropdown.Item>
-                            <NavDropdown.Item href="/my-properties" className="propertyItem">
+                            <NavDropdown.Item href="/my-properties-reserved" className="propertyItem">
                                 Manage My Schedule
                             </NavDropdown.Item>
                             <NavDropdown.Item href="/Properties/Requests" className="propertyItem">
@@ -102,9 +134,14 @@ export const NavBar = () => {
                 </Nav>
                 <Nav className="ms-auto">
                     {isLoggedInSt ? 
-                        <Button id="button-logout" variant="danger" onClick = {logout}>
-                            <strong>Logout</strong>
-                        </Button>
+                        <>
+                            <p style={{color:"white", marginRight: "2rem"}}>Amount: U$D {money}</p>
+                            <div>
+                                <Button id="button-logout" variant="danger" onClick = {logout}>
+                                    <strong>Logout</strong>
+                                </Button>
+                            </div>
+                        </>
                         :
                         <Button id="button-login" variant="primary" href="/login">
                             <strong>Login</strong>

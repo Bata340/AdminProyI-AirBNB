@@ -13,6 +13,7 @@ class User(BaseModel):
     location: str
     login: bool
     score: Optional[List[int]] = None
+    money: Optional[float] = 0
 
 class UserLogin(BaseModel):
     username: str

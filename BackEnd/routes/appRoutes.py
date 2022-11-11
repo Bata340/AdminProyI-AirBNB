@@ -27,6 +27,7 @@ registeredExperiences = {}
 requestedreserveProperties = {}
 reservedExperience = {}
 acceptedReservationProperties = {}
+pendingPayments = {}
 userReviews = {"generico": []}
 propertiesReviews = {"generico": []}
 
@@ -294,7 +295,10 @@ async def reserve_property(id:str, reserve: schema.Reservation):
     reserve.id = str(uuid.uuid4())
     reserve.propertyId = id
     requestedreserveProperties[id].append(reserve)
-    return {"message": "Reservation " + reserve.id  + " was requested  in property " + id + " between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
+    return {
+        "message": "Reservation " + reserve.id  + " was requested  in property " + id + " between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d"),
+        "reservation_id": reserve.id
+        }
 
 @router.get("/users/myReservation/{username}", status_code=status.HTTP_200_OK)
 async def get_user_reservations(username: str):
@@ -313,10 +317,14 @@ async def process_reservation(reservationId: str, status: str, propertyId: str):
         return HTTPException(status_code=404, detail="Requested Reservation with id " + reservationId + " does not exist")
     if status == 'accepted':
         requestedreserveProperties[propertyId].remove(reservation)
+        owner = registeredProperties[propertyId].owner
+        registeredUsers[owner].money += pendingPayments[reservationId]
+        pendingPayments.pop(reservationId)
         acceptedReservationProperties[propertyId].append(reservation)
         return {"message": "Reservation " + reservationId + " for property "+ propertyId + " was accepted"}
     else :
         requestedreserveProperties[propertyId].remove(reservation)
+        pendingPayments.pop(reservationId)
         return {"message": "Reservation "+ reservationId + " was cancelled"}
     
 
@@ -372,6 +380,13 @@ async def get_reserve_dates_for_property(id:str, type: str):
             final_return.append(return_message)
         return {"message": final_return}
 
+
+@router.post("/property/payReservation/{reservationId}")
+async def pay_reservation(reservationId: str, amount: float):
+    if reservationId in pendingPayments.keys():
+        return HTTPException(status_code=500, detail="Reservation with id " + reservationId + " has already been paid.")
+    pendingPayments[reservationId] = amount
+    return {"message": "Payment has been correctly done for reservation: " + reservationId + "."}
     
 
 @router.get("/experiences", status_code=status.HTTP_200_OK)

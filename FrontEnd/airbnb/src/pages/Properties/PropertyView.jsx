@@ -34,6 +34,36 @@ export const PropertyView = (props) => {
     }
 
 
+    const payTheReservation = async (reservationId) => {
+
+        const millisecondsToDaysDivisor = (1000*3600*24);
+        const timeReservationInMs = (new Date(checkout).getTime() - new Date(checkin).getTime());
+        const quantityOfDays = timeReservationInMs / millisecondsToDaysDivisor;
+        const finalPrice = property.price * quantityOfDays;
+        
+        const paramsPost = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+        const url = `${API_URL}/property/payReservation/${reservationId}?amount=${finalPrice}`;
+        const response = await fetch(
+            url,
+            paramsPost
+        );
+        const jsonResponse = await response.json();
+        if (response.status === 200){
+            if(!jsonResponse.status_code){
+                return;
+            }else{
+                throw new Error("Error Code: "+jsonResponse.status_code);
+            }
+        }
+        throw new Error("Error Code: "+jsonResponse.status_code);
+    }
+
+
     const paymentAndReservation = async () => {
         const paramsPost = {
             method: "POST",
@@ -55,9 +85,11 @@ export const PropertyView = (props) => {
         const jsonResponse = await response.json();
         if (response.status === 200){
             if(!jsonResponse.status_code){
+                await payTheReservation(jsonResponse.reservation_id);
                 return;
+            }else{
+                throw new Error("Error Code: "+jsonResponse.status_code);
             }
-            throw new Error("Error Code: "+jsonResponse.status_code);
         }
         throw new Error("Error Code: "+jsonResponse.status_code);
     }

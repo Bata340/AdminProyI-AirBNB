@@ -1,5 +1,6 @@
 import { Login, SignUp, Properties, PropertiesUpload, MyProperties, PropertiesEdit, 
-	PropertyView, MyPropertiesRequests, ReviewUsers, ReviewProperties, ExperiencesUpload } from '../pages';
+	PropertyView, MyPropertiesRequests, ReviewUsers, ReviewProperties, ExperiencesUpload,
+	ReservedProperties } from '../pages';
 import { NavBar } from '../common/Navbar/Navbar';
 import{ BrowserRouter as Router, Routes as Switch, Route } from 'react-router-dom';
 import '../common/common.css';
@@ -20,6 +21,7 @@ function ReactRoutes() {
 					<Route exact path="/properties/admin-my-props" element={<MyProperties/>}/>
 					<Route exact path="/properties/edit" element={<PropertiesEdit/>}/>
 					<Route exact path="/property" element={<PropertyView/>}/>
+					<Route exact path="/my-properties-reserved" element={<ReservedProperties/>}/>
 					<Route exact path="/Properties/Requests" element={<MyPropertiesRequests/>}/>
 					<Route exact path="/reviews/occupants" element={<ReviewUsers/>}/>
 					<Route exact path="/reviews/properties" element={<ReviewProperties/>}/>

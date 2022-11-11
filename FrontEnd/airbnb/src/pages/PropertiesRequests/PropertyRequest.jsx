@@ -37,7 +37,7 @@ export default function PropertyRequest (props) {
 
   const acceptBooking = async () => {
     setAcceptOrReject("accept");
-    setFunctionHandleDialog({callback:() => {processBooking("accepted")}});
+    setFunctionHandleDialog({callback:() => {processBooking("accepted"); }});
     setOpenDialog(true);
   }
 
