@@ -10,3 +10,5 @@ export * from './ReviewUsers/ReviewUsers';
 export * from './ReviewProperties/ReviewProperties';
 export * from './ExperiencesUpload/ExperiencesUpload';
 export * from './ReservedProperties/ReservedProperties';
+export * from './MyExperiences/MyExperiences';
+
