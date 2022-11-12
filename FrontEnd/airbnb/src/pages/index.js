@@ -9,3 +9,5 @@ export * from './PropertiesRequests/MyPropertiesRequests';
 export * from './ReviewUsers/ReviewUsers';
 export * from './ReviewProperties/ReviewProperties';
 export * from './ExperiencesUpload/ExperiencesUpload';
+export * from './MyExperiences/MyExperiences';
+
