@@ -306,7 +306,11 @@ async def get_user_reservations(username: str):
     for _, value in acceptedReservationProperties.items():
         for reservation in value:
             if  reservation.userid == username :
-                user_reservations.append(reservation)
+                objectToAppend = {
+                    "reservation": reservation,
+                    "property": registeredProperties[reservation.propertyId]
+                }
+                user_reservations.append(objectToAppend)
     return user_reservations
 
 
@@ -402,6 +406,14 @@ async def create_experience(experience: schema.Experience):
     registeredExperiences[id] = experience
     reservedExperience[id] = []
     return {"message" : "registered experience with id: " + id}
+
+
+@router.delete("/experience/{experienceId}", status_code=status.HTTP_200_OK)
+async def delete_experience(experienceId: str):
+    if experienceId not in registeredExperiences.keys():
+        return HTTPException(status_code=404, detail="Experience with id " + experienceId + " does not exist")
+    registeredExperiences.pop(experienceId)
+    return {"message" : "Deleted experience with id: " + experienceId}
 
 
 @router.post("/experience/reserve/{id}", status_code=status.HTTP_200_OK)

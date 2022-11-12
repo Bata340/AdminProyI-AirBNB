@@ -48,6 +48,7 @@ export const MyExperiences = () => {
                 const arrayProps = [];
                 const keys = Object.keys(jsonResponse);
                 for ( let i=0; i<keys.length; i++){
+                    jsonResponse[keys[i]].key = keys[i];
                     arrayProps.push(jsonResponse[keys[i]]);
                 }
                 await getImagesFromFireBase(arrayProps);
@@ -65,7 +66,6 @@ export const MyExperiences = () => {
         !loading ? 
         <Container>
             <Grid container spacing={5}>
-                {console.log(inmuebles.length)}
                 {inmuebles.length > 0 ? 
                     inmuebles.map( (exp, idx) => {
                         return (

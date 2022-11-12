@@ -47,7 +47,6 @@ export const NavBar = () => {
             const jsonResponse = await response.json();
             if (response.status === 200){
                 if(!jsonResponse.status_code){
-                    console.log(jsonResponse);
                     setMoney(jsonResponse.message.money);
                 }
             }

@@ -172,26 +172,28 @@ export const ExperiencesUpload = (exp) => {
                         onChange = {(event) => setType(event.target.value)}
                     />
                 </Container>
-                <FormControl sx={{ m: 1, width: 300 }}>
-                    <InputLabel id="demo-multiple-checkbox-label">Languages</InputLabel>
-                    <Select
-                    labelId="demo-multiple-checkbox-label"
-                    id="demo-multiple-checkbox"
-                    multiple
-                    value={languages}
-                    onChange={handleChange}
-                    input={<OutlinedInput label="Languages" />}
-                    renderValue={(selected) => selected.join(', ')}
-                    MenuProps={MenuProps}
-                    >
-                    {languagesList.map((language) => (
-                        <MenuItem key={language} value={language}>
-                        <Checkbox checked={languages.indexOf(language) > -1} />
-                        <ListItemText primary={language} />
-                        </MenuItem>
-                    ))}
-                    </Select>
-                </FormControl>
+                <Container className={"inputClass"}>
+                    <FormControl className={"inputStyle"}>
+                        <InputLabel id="demo-multiple-checkbox-label">Languages</InputLabel>
+                        <Select
+                        labelId="demo-multiple-checkbox-label"
+                        id="demo-multiple-checkbox"
+                        multiple
+                        value={languages}
+                        onChange={handleChange}
+                        input={<OutlinedInput label="Languages" />}
+                        renderValue={(selected) => selected.join(', ')}
+                        MenuProps={MenuProps}
+                        >
+                        {languagesList.map((language) => (
+                            <MenuItem key={language} value={language}>
+                            <Checkbox checked={languages.indexOf(language) > -1} />
+                            <ListItemText primary={language} />
+                            </MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>
+                </Container>
                 <Container className={"inputClass"}>
                     <TextField
                         id="description"

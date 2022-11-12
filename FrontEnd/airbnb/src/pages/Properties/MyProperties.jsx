@@ -65,7 +65,6 @@ export const MyProperties = () => {
         !loading ? 
         <Container>
             <Grid container spacing={5}>
-                {console.log(inmuebles.length)}
                 {inmuebles.length > 0 ? 
                     inmuebles.map( (prop, idx) => {
                         return (
