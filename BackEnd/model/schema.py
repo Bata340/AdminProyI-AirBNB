@@ -56,6 +56,14 @@ class Experience(BaseModel):
     type: str
     languages: List[str]
 
+class ExperiencePatch(BaseModel):
+    name: str
+    price: int
+    description: str 
+    location: str
+    photos: Union[List[str], None] = None
+    languages: List[str]
+
 class PropertyFilters(BaseModel):
     
 

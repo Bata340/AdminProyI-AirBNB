@@ -389,6 +389,23 @@ async def create_experience(experience: schema.Experience):
     return {"message" : "registered experience with id: " + id}
 
 
+@router.delete("/experience/{id}", status_code=status.HTTP_200_OK)
+async def delete_experience(id: str):
+    if id not in registeredExperiences.keys():
+        return HTTPException(status_code=404, detail="Experience with id " + id + " does not exist")
+    registeredExperiences.pop(id)
+    return {"message": "Experience with id " + id + "was deleted"} 
+
+@router.delete("/experience/{id_exp}/photos/{id_photo}")
+async def delete_experience(id_exp: str, id_photo: str):
+    if id_exp not in registeredExperiences.keys():
+        return HTTPException(status_code=404, detail="Experience with id " + id + " does not exist")
+    if id_photo not in registeredExperiences[id_exp].photos:
+        return HTTPException(status_code=404, detail="Photo with id " + id + " does not exist")
+    registeredExperiences[id_exp].photos.pop(registeredExperiences[id_exp].photos.index(id_photo))
+    return {"message": "photo with id " + id_photo + "was deleted from experience with id " + id_exp } 
+
+
 @router.post("/experience/reserve/{id}", status_code=status.HTTP_200_OK)
 async def reserve_experience(id:str, reserve: schema.Reservation):
     if id not in ReservedExperience.keys():
@@ -397,6 +414,17 @@ async def reserve_experience(id:str, reserve: schema.Reservation):
     reservedExperiences[id].append(reserve)
     return {"message": "Experience with id " + id + "was reserve between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
 
+@router.patch("/experiences/{id}", status_code=status.HTTP_200_OK)
+async def update_experience(id: str, experience: schema.ExperiencePatch):
+    if id not in registeredExperiences.keys():
+        return HTTPException(status_code=404, detail="Experience with id " + id + " does not exist")
+
+    stored_experience_data = registeredExperiences[id]
+    update_data = experience.dict(exclude_unset=True)
+    updated_experience = stored_experience_data.copy(update=update_data)
+    registeredExperiences[id] = updated_experience
+
+    return {"message": registeredExperiences[id]}
 
 @router.get("/reviews/get-users-to-review/{owner_id}", status_code=status.HTTP_200_OK)
 async def get_users_to_review(owner_id: str):
@@ -424,3 +452,4 @@ async def get_users_to_review(user_id: str):
             if not any(prop.get("key", None) == reservation.propertyId for prop in propertiesToReturn):
                 propertiesToReturn.append({"key": reservation.propertyId, "property": registeredProperties[reservation.propertyId]})
     return propertiesToReturn
+    
