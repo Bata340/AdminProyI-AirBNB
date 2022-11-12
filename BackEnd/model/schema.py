@@ -46,6 +46,7 @@ class Reservation(BaseModel):
 
 
 class Experience(BaseModel):
+    key: Optional[str]
     name: str
     owner: str
     price: int
@@ -57,16 +58,15 @@ class Experience(BaseModel):
     languages: List[str]
 
 class ExperiencePatch(BaseModel):
-    name: str
-    price: int
-    description: str 
-    location: str
-    photos: Union[List[str], None] = None
-    languages: List[str]
+    name: Optional[str]
+    price: Optional[int]
+    description: Optional[str] 
+    location: Optional[str]
+    photos: Optional[List[str]]
+    languages: Optional[List[str]]
 
 class PropertyFilters(BaseModel):
     
-
     owner: Optional[str] = None
     lowerPrice: Optional[int] = None
     highestPrice: Optional[int] = None

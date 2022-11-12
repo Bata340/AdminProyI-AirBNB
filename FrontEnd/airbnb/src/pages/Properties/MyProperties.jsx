@@ -43,6 +43,7 @@ export const MyProperties = () => {
             paramsUpload
         );
         const jsonResponse = await response.json();
+
         if (response.status === 200){
             if(!jsonResponse.status_code){
                 const arrayProps = [];

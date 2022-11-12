@@ -1,5 +1,5 @@
 import { Login, SignUp, Properties, PropertiesUpload, MyProperties, PropertiesEdit, 
-	PropertyView, MyPropertiesRequests, ReviewUsers, ReviewProperties, ExperiencesUpload, MyExperiences } from '../pages';
+	PropertyView, MyPropertiesRequests, ReviewUsers, ReviewProperties, ExperiencesUpload, MyExperiences, ExperiencesEdit } from '../pages';
 import { NavBar } from '../common/Navbar/Navbar';
 import{ BrowserRouter as Router, Routes as Switch, Route } from 'react-router-dom';
 import '../common/common.css';
@@ -25,6 +25,8 @@ function ReactRoutes() {
 					<Route exact path="/reviews/properties" element={<ReviewProperties/>}/>
 					<Route exact path="/experiences/add" element={<ExperiencesUpload/>}/>
 					<Route exact path="/experiences/admin-my-experiences" element={<MyExperiences/>}/>
+					<Route exact path="/experiences/edit" element={<ExperiencesEdit/>}/>
+
 				</Switch>
 			</Router>
 		</>

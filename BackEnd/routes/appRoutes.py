@@ -52,17 +52,13 @@ def filterExperiencesByOwner(registryList, owner):
 def filterPropertiesByOwner(propiesties, owner):
     ownersRegistryList = []
     for value in propiesties:
-        print(value)
-        print(owner)
         if value.owner == owner:
             ownersRegistryList.append(value)
-        print(value.owner)
     return ownersRegistryList
 
 def filterPropertiesByLocation(properties, location):
     locationPropertiesList = []
     for value in properties:
-        print(value.location == location)
         if value.location == location:
             locationPropertiesList.append(value)
     return locationPropertiesList
@@ -372,7 +368,27 @@ async def get_reserve_dates_for_property(id:str, type: str):
             final_return.append(return_message)
         return {"message": final_return}
 
-    
+@router.get("/experience/{id}", status_code=status.HTTP_200_OK)
+async def getExperience(id: str):
+    if id not in registeredExperiences.keys():
+        return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
+    exp_score = 0
+    if len(registeredExperiences[id].score) > 0:
+        exp_score = functools.reduce(lambda a,b: a+b, registeredExperiences[id].score)/len(registeredExperiences[id].score)
+    return_message = {
+        "key": registeredExperiences[id].key,
+        "name": registeredExperiences[id].name,
+        "owner": registeredExperiences[id].owner,
+        "price": registeredExperiences[id].price,
+        "description": registeredExperiences[id].description,
+        "location": registeredExperiences[id].location,
+        "score": exp_score,
+        "numOfVotes": len(registeredExperiences[id].score),
+        "type": registeredExperiences[id].type,
+        "photos": registeredExperiences[id].photos,
+        "languages": registeredExperiences[id].languages
+    }
+    return {"message": return_message}   
 
 @router.get("/experiences", status_code=status.HTTP_200_OK)
 async def get_experiences(owner: Optional[str] = None, typeOfExperience: Optional[str] = None): 
@@ -380,11 +396,21 @@ async def get_experiences(owner: Optional[str] = None, typeOfExperience: Optiona
     finalExperiences = filterExperiencesByType(registeredExperiences, typeOfExperience) 
     return registeredExperiences
     
-
 @router.post("/experience", status_code=status.HTTP_200_OK)
 async def create_experience(experience: schema.Experience):
     id = str(uuid.uuid4())
-    registeredExperiences[id] = experience
+    registeredExperiences[id] = schema.Experience(
+        key = id, 
+        name = experience.name,
+        owner = experience.owner,
+        price = experience.price,
+        description = experience.description,
+        location = experience.location,
+        type = experience.type,
+        score = [],
+        photos = experience.photos,
+        languages = experience.languages
+    )
     reservedExperience[id] = []
     return {"message" : "registered experience with id: " + id}
 
@@ -423,7 +449,7 @@ async def update_experience(id: str, experience: schema.ExperiencePatch):
     update_data = experience.dict(exclude_unset=True)
     updated_experience = stored_experience_data.copy(update=update_data)
     registeredExperiences[id] = updated_experience
-
+    print(updated_experience)
     return {"message": registeredExperiences[id]}
 
 @router.get("/reviews/get-users-to-review/{owner_id}", status_code=status.HTTP_200_OK)

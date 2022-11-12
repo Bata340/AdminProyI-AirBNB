@@ -43,6 +43,8 @@ export const MyExperiences = () => {
             paramsUpload
         );
         const jsonResponse = await response.json();
+        {console.log(jsonResponse)}
+
         if (response.status === 200){
             if(!jsonResponse.status_code){
                 const arrayProps = [];

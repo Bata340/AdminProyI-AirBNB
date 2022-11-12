@@ -10,4 +10,4 @@ export * from './ReviewUsers/ReviewUsers';
 export * from './ReviewProperties/ReviewProperties';
 export * from './ExperiencesUpload/ExperiencesUpload';
 export * from './MyExperiences/MyExperiences';
-
+export * from './ExperiencesEdit/ExperiencesEdit';
