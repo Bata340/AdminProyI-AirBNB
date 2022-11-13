@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {Card, CardContent, CardMedia, Typography, Rating, TextField } from '@mui/material'
+import {Card, CardContent, CardMedia, Typography, TextField } from '@mui/material'
 import {useState} from 'react';
 import { useEffect } from 'react';
 
-export default function Property (props) {
+export default function Experience (props) {
 
   const [imageURL, setImageURL] = useState( props.photos );
 
@@ -24,22 +24,19 @@ export default function Property (props) {
           image={imageURL}
           alt={props.name}
         />
-
         <TextField
-          label="Description"
-          multiline
-          rows={4}
-          value={props.description}
-          inputProps={
-              {readOnly: true}
-          }
-          style={{width:"100%", marginTop: "1rem", marginBottom: "1rem"}}
+            label="Description"
+            multiline
+            rows={4}
+            value={props.description}
+            inputProps={
+                {readOnly: true}
+            }
+            style={{width:"100%", marginTop: "1rem", marginBottom: "1rem"}}
         />
         <Typography variant="body2">
           by {props.owner} in {props.location}
         </Typography>
-        <Rating readOnly value={props.score || 0} name="scoreProperty"/>
-        <Typography>{props.numOfVotes} opinion{props.numOfVotes !== 1? "s" : null}</Typography>
         <p style={{color:"blue", marginTop:"1rem"}}>
           U$D {props.price}
         </p>

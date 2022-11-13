@@ -53,11 +53,8 @@ def filterExperiencesByOwner(registryList, owner):
 def filterPropertiesByOwner(propiesties, owner):
     ownersRegistryList = []
     for value in propiesties:
-        print(value)
-        print(owner)
         if value.owner == owner:
             ownersRegistryList.append(value)
-        print(value.owner)
     return ownersRegistryList
 
 def filterPropertiesByLocation(properties, location):
@@ -99,20 +96,39 @@ def filterPropertiesByServices(properties, services):
 def filterExperiencesByType(experiences, typeOfExperience):
     if typeOfExperience is not None: 
         experienceList = []
-        for key, value in experiences.items():
+        for value in experiences:
             if value.type == typeOfExperience:
-                experience = experiences[key]
-                experienceList.append(experience)
+                experienceList.append(value)
         return experienceList
     return experiences
 
 
-def removeNoneValues(dict_aux: dict):
-    dict_aux2 = {}
-    for key, value in dict_aux.items():
-        if value is not None:
-            dict_aux2[key] = value
-    return dict_aux2
+def filterExperiencesByMinPrice(experiences, minPrice):
+    if minPrice is not None:
+        experienceList = []
+        for value in experiences:
+            if value.price >= minPrice:
+                experienceList.append(value)
+        return experienceList
+    return experiences
+
+def filterExperiencesByMaxPrice(experiences, maxPrice):
+    if maxPrice is not None:
+        experienceList = []
+        for value in experiences:
+            if value.price <= maxPrice:
+                experienceList.append(value)
+        return experienceList
+    return experiences
+
+def filterExperiencesByLocation(experiences, location):
+    if location is not None:
+        experienceList = []
+        for value in experiences:
+            if value.location == location:
+                experienceList.append(value)
+        return experienceList
+    return experiences
 
 @router.post("/register", status_code=status.HTTP_200_OK)
 async def register(user: schema.User):
@@ -394,16 +410,33 @@ async def pay_reservation(reservationId: str, amount: float):
     
 
 @router.get("/experiences", status_code=status.HTTP_200_OK)
-async def get_experiences(owner: Optional[str] = None, typeOfExperience: Optional[str] = None): 
-    ownersExperiences = filterExperiencesByOwner(registeredExperiences, owner)
-    finalExperiences = filterExperiencesByType(registeredExperiences, typeOfExperience) 
-    return registeredExperiences
+async def get_experiences(owner: Optional[str] = None, typeOfExperience: Optional[str] = None, 
+lowerPrice: Optional[float] = None, highestPrice: Optional[float] = None, location: Optional[str] = None): 
+    arrayExperiences = [value for key , value in registeredExperiences.items()]
+    arrayExperiences = filterExperiencesByOwner(arrayExperiences, owner)
+    arrayExperiences = filterExperiencesByType(arrayExperiences, typeOfExperience) 
+    arrayExperiences = filterExperiencesByMinPrice(arrayExperiences, lowerPrice)
+    arrayExperiences = filterExperiencesByMaxPrice(arrayExperiences, highestPrice)
+    arrayExperiences = filterExperiencesByLocation(arrayExperiences, location)
+    return arrayExperiences
     
 
 @router.post("/experience", status_code=status.HTTP_200_OK)
 async def create_experience(experience: schema.Experience):
     id = str(uuid.uuid4())
-    registeredExperiences[id] = experience
+    experienceToPush = schema.Experience(
+        key=id,
+        name=experience.name,
+        owner=experience.owner,
+        price=experience.price,
+        description=experience.description,
+        location=experience.location,
+        score=experience.score,
+        photos=experience.photos,
+        type=experience.type,
+        languages=experience.languages
+    )
+    registeredExperiences[id] = experienceToPush
     reservedExperience[id] = []
     return {"message" : "registered experience with id: " + id}
 

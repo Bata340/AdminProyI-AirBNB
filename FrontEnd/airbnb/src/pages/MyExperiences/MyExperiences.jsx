@@ -48,7 +48,6 @@ export const MyExperiences = () => {
                 const arrayProps = [];
                 const keys = Object.keys(jsonResponse);
                 for ( let i=0; i<keys.length; i++){
-                    jsonResponse[keys[i]].key = keys[i];
                     arrayProps.push(jsonResponse[keys[i]]);
                 }
                 await getImagesFromFireBase(arrayProps);

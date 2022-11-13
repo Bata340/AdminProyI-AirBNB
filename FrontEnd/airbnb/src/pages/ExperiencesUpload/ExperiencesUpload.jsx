@@ -75,7 +75,7 @@ export const ExperiencesUpload = (exp) => {
         setLoadingAsync(false);
         if (response.status === 200){
             if(!jsonResponse.status_code){
-                navigate('/');
+                navigate('/experiences');
                 window.location.reload();
             }else{
                 setErrorExperienceUpload(jsonResponse.detail);
@@ -89,8 +89,8 @@ export const ExperiencesUpload = (exp) => {
         setErrorExperienceUpload('');
     }
 
-    const goBackToHome = (event) => {
-      navigate('/');
+    const goBackToExperiences = (event) => {
+      navigate('/experiences');
     }
 
     const handleUploadPhotos = async () => {
@@ -227,7 +227,7 @@ export const ExperiencesUpload = (exp) => {
                         <Button type="submit" variant="contained" sx={{fontSize:16}}>Upload</Button>
                     </Container>
                     <Container  className={"buttonClass"} maxWidth="sm">
-                        <Button type="button" variant="contained" color="error" sx={{fontSize:16}} onClick={goBackToHome}>Cancel</Button>
+                        <Button type="button" variant="contained" color="error" sx={{fontSize:16}} onClick={goBackToExperiences}>Cancel</Button>
                     </Container>
                 </>
                 }

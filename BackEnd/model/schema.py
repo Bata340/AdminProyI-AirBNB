@@ -47,6 +47,7 @@ class Reservation(BaseModel):
 
 
 class Experience(BaseModel):
+    key: Optional[str]
     name: str
     owner: str
     price: int
