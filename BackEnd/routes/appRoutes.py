@@ -25,8 +25,9 @@ registeredProperties = {}
 registeredExperiences = {}
 
 requestedreserveProperties = {}
-ReserveExperience = {}
+reservedExperience = {}
 acceptedReservationProperties = {}
+pendingPayments = {}
 userReviews = {"generico": []}
 propertiesReviews = {"generico": []}
 
@@ -52,11 +53,8 @@ def filterExperiencesByOwner(registryList, owner):
 def filterPropertiesByOwner(propiesties, owner):
     ownersRegistryList = []
     for value in propiesties:
-        print(value)
-        print(owner)
         if value.owner == owner:
             ownersRegistryList.append(value)
-        print(value.owner)
     return ownersRegistryList
 
 def filterPropertiesByLocation(properties, location):
@@ -98,20 +96,39 @@ def filterPropertiesByServices(properties, services):
 def filterExperiencesByType(experiences, typeOfExperience):
     if typeOfExperience is not None: 
         experienceList = []
-        for key, value in experiences.items():
+        for value in experiences:
             if value.type == typeOfExperience:
-                experience = experiences[key]
-                experienceList.append(experience)
+                experienceList.append(value)
         return experienceList
     return experiences
 
 
-def removeNoneValues(dict_aux: dict):
-    dict_aux2 = {}
-    for key, value in dict_aux.items():
-        if value is not None:
-            dict_aux2[key] = value
-    return dict_aux2
+def filterExperiencesByMinPrice(experiences, minPrice):
+    if minPrice is not None:
+        experienceList = []
+        for value in experiences:
+            if value.price >= minPrice:
+                experienceList.append(value)
+        return experienceList
+    return experiences
+
+def filterExperiencesByMaxPrice(experiences, maxPrice):
+    if maxPrice is not None:
+        experienceList = []
+        for value in experiences:
+            if value.price <= maxPrice:
+                experienceList.append(value)
+        return experienceList
+    return experiences
+
+def filterExperiencesByLocation(experiences, location):
+    if location is not None:
+        experienceList = []
+        for value in experiences:
+            if value.location == location:
+                experienceList.append(value)
+        return experienceList
+    return experiences
 
 @router.post("/register", status_code=status.HTTP_200_OK)
 async def register(user: schema.User):
@@ -294,7 +311,10 @@ async def reserve_property(id:str, reserve: schema.Reservation):
     reserve.id = str(uuid.uuid4())
     reserve.propertyId = id
     requestedreserveProperties[id].append(reserve)
-    return {"message": "Reservation " + reserve.id  + " was requested  in property " + id + " between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
+    return {
+        "message": "Reservation " + reserve.id  + " was requested  in property " + id + " between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d"),
+        "reservation_id": reserve.id
+        }
 
 @router.get("/users/myReservation/{username}", status_code=status.HTTP_200_OK)
 async def get_user_reservations(username: str):
@@ -302,7 +322,11 @@ async def get_user_reservations(username: str):
     for _, value in acceptedReservationProperties.items():
         for reservation in value:
             if  reservation.userid == username :
-                user_reservations.append(reservation)
+                objectToAppend = {
+                    "reservation": reservation,
+                    "property": registeredProperties[reservation.propertyId]
+                }
+                user_reservations.append(objectToAppend)
     return user_reservations
 
 
@@ -313,10 +337,14 @@ async def process_reservation(reservationId: str, status: str, propertyId: str):
         return HTTPException(status_code=404, detail="Requested Reservation with id " + reservationId + " does not exist")
     if status == 'accepted':
         requestedreserveProperties[propertyId].remove(reservation)
+        owner = registeredProperties[propertyId].owner
+        registeredUsers[owner].money += pendingPayments[reservationId]
+        pendingPayments.pop(reservationId)
         acceptedReservationProperties[propertyId].append(reservation)
         return {"message": "Reservation " + reservationId + " for property "+ propertyId + " was accepted"}
     else :
         requestedreserveProperties[propertyId].remove(reservation)
+        pendingPayments.pop(reservationId)
         return {"message": "Reservation "+ reservationId + " was cancelled"}
     
 
@@ -372,29 +400,61 @@ async def get_reserve_dates_for_property(id:str, type: str):
             final_return.append(return_message)
         return {"message": final_return}
 
+
+@router.post("/property/payReservation/{reservationId}")
+async def pay_reservation(reservationId: str, amount: float):
+    if reservationId in pendingPayments.keys():
+        return HTTPException(status_code=500, detail="Reservation with id " + reservationId + " has already been paid.")
+    pendingPayments[reservationId] = amount
+    return {"message": "Payment has been correctly done for reservation: " + reservationId + "."}
     
 
 @router.get("/experiences", status_code=status.HTTP_200_OK)
-async def get_experiences(owner: Optional[str] = None, typeOfExperience: Optional[str] = None): 
-    ownersExperiences = filterExperiencesByOwner(registeredExperiences, owner)
-    finalExperiences = filterExperiencesByType(registeredExperiences, typeOfExperience) 
-    return registeredExperiences
+async def get_experiences(owner: Optional[str] = None, typeOfExperience: Optional[str] = None, 
+lowerPrice: Optional[float] = None, highestPrice: Optional[float] = None, location: Optional[str] = None): 
+    arrayExperiences = [value for key , value in registeredExperiences.items()]
+    arrayExperiences = filterExperiencesByOwner(arrayExperiences, owner)
+    arrayExperiences = filterExperiencesByType(arrayExperiences, typeOfExperience) 
+    arrayExperiences = filterExperiencesByMinPrice(arrayExperiences, lowerPrice)
+    arrayExperiences = filterExperiencesByMaxPrice(arrayExperiences, highestPrice)
+    arrayExperiences = filterExperiencesByLocation(arrayExperiences, location)
+    return arrayExperiences
     
 
 @router.post("/experience", status_code=status.HTTP_200_OK)
 async def create_experience(experience: schema.Experience):
     id = str(uuid.uuid4())
-    registeredExperiences[id] = experience
-    reserveExperience[id] = []
+    experienceToPush = schema.Experience(
+        key=id,
+        name=experience.name,
+        owner=experience.owner,
+        price=experience.price,
+        description=experience.description,
+        location=experience.location,
+        score=experience.score,
+        photos=experience.photos,
+        type=experience.type,
+        languages=experience.languages
+    )
+    registeredExperiences[id] = experienceToPush
+    reservedExperience[id] = []
     return {"message" : "registered experience with id: " + id}
+
+
+@router.delete("/experience/{experienceId}", status_code=status.HTTP_200_OK)
+async def delete_experience(experienceId: str):
+    if experienceId not in registeredExperiences.keys():
+        return HTTPException(status_code=404, detail="Experience with id " + experienceId + " does not exist")
+    registeredExperiences.pop(experienceId)
+    return {"message" : "Deleted experience with id: " + experienceId}
 
 
 @router.post("/experience/reserve/{id}", status_code=status.HTTP_200_OK)
 async def reserve_experience(id:str, reserve: schema.Reservation):
-    if id not in ReserveExperience.keys():
+    if id not in ReservedExperience.keys():
         return HTTPException(status_code=404, detail="Experience with id " + id + " does not exist")
 
-    reserveExperiences[id].append(reserve)
+    reservedExperiences[id].append(reserve)
     return {"message": "Experience with id " + id + "was reserve between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
 
 

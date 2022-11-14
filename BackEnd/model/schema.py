@@ -13,6 +13,7 @@ class User(BaseModel):
     location: str
     login: bool
     score: Optional[List[int]] = None
+    money: Optional[float] = 0
 
 class UserLogin(BaseModel):
     username: str
@@ -46,12 +47,13 @@ class Reservation(BaseModel):
 
 
 class Experience(BaseModel):
+    key: Optional[str]
     name: str
     owner: str
     price: int
     description: str 
     location: str
-    score: int
+    score: Optional[List[int]] = None
     photos: Union[List[str], None] = None
     type: str
     languages: List[str]

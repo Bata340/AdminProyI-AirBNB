@@ -1,15 +1,10 @@
-import React from "react";
+import { useState, useEffect } from "react";
 
 import { Navbar, Nav, NavDropdown, Button } from "react-bootstrap";
 import "./Navbar.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function logout(){
-	localStorage.removeItem("sessionToken");
-    localStorage.removeItem("user");
-    localStorage.removeItem("username");
-    window.location.reload();
-}
+
 
 function isLoggedIn(){
     return (
@@ -19,6 +14,58 @@ function isLoggedIn(){
 }
 
 export const NavBar = () => {
+
+    const [isLoggedInSt, setIsLoggedInSt] = useState(isLoggedIn());
+    const [money, setMoney] = useState(0);
+    const API_URL = 'http://localhost:8000';
+
+    const logout = () => {
+        localStorage.removeItem("sessionToken");
+        localStorage.removeItem("user");
+        localStorage.removeItem("username");
+        window.location.reload();
+    }
+
+
+    useEffect(() => {
+        const handleStorage = () => {
+            setIsLoggedInSt(isLoggedIn());
+        }
+
+        const retrieveMoney = async () => {
+            const paramsGet = {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            };
+            const url = `${API_URL}/users/${localStorage.getItem("username")}`;
+            const response = await fetch(
+                url,
+                paramsGet
+            );
+            const jsonResponse = await response.json();
+            if (response.status === 200){
+                if(!jsonResponse.status_code){
+                    setMoney(jsonResponse.message.money);
+                }
+            }
+        }
+
+        setIsLoggedInSt(isLoggedIn());
+        if(isLoggedInSt){
+            retrieveMoney();
+        }
+    
+        window.addEventListener('storage', handleStorage);
+        window.addEventListener('payment', retrieveMoney);
+        return () => {
+            window.removeEventListener('storage', handleStorage); 
+            window.removeEventListener('payment', retrieveMoney);
+        };
+    }, []);
+
+
 	return (
 		<div className="fixed-top">
             <Navbar bg="color_custom_nav" expand="lg">
@@ -28,7 +75,7 @@ export const NavBar = () => {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" style={{marginRight:'2rem'}}/>
                 <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">
-                    {isLoggedIn() && 
+                    {isLoggedInSt && 
                         <NavDropdown
                         className="mx-3"
                         title="Properties"
@@ -40,7 +87,7 @@ export const NavBar = () => {
                             <NavDropdown.Item href="/properties/admin-my-props" className="propertyItem">
                                 Manage My Properties
                             </NavDropdown.Item>
-                            <NavDropdown.Item href="/my-properties" className="propertyItem">
+                            <NavDropdown.Item href="/my-properties-reserved" className="propertyItem">
                                 Manage My Schedule
                             </NavDropdown.Item>
                             <NavDropdown.Item href="/Properties/Requests" className="propertyItem">
@@ -56,7 +103,7 @@ export const NavBar = () => {
                         <NavDropdown.Item href="/experiences" className="experienceItem">
                             Search Experiences
                         </NavDropdown.Item>
-                        {isLoggedIn() && 
+                        {isLoggedInSt && 
                             <>
                                 <NavDropdown.Item href="/experiences/add" className="experienceItem">
                                     Add An Experience
@@ -70,7 +117,7 @@ export const NavBar = () => {
                             </>
                         }
                     </NavDropdown>
-                    {isLoggedIn() && 
+                    {isLoggedInSt && 
                     <NavDropdown
                     className="mx-3"
                     title="Reviews"
@@ -85,10 +132,15 @@ export const NavBar = () => {
                     </NavDropdown>}
                 </Nav>
                 <Nav className="ms-auto">
-                    {isLoggedIn() ? 
-                        <Button id="button-logout" variant="danger" onClick = {logout}>
-                            <strong>Logout</strong>
-                        </Button>
+                    {isLoggedInSt ? 
+                        <>
+                            <p style={{color:"white", marginRight: "2rem"}}>Amount: U$D {money}</p>
+                            <div>
+                                <Button id="button-logout" variant="danger" onClick = {logout}>
+                                    <strong>Logout</strong>
+                                </Button>
+                            </div>
+                        </>
                         :
                         <Button id="button-login" variant="primary" href="/login">
                             <strong>Login</strong>

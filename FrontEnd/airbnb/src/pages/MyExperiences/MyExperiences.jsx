@@ -1,11 +1,11 @@
 import { Container, Grid, CircularProgress } from '@mui/material';
 import React from 'react';
-import MyProperty from './MyProperty';
+import MyExperience from './MyExperience';
 import { getFirebaseImage } from '../../common/FirebaseHandler';
 import { useEffect, useState } from 'react';
 
 
-export const MyProperties = () => {
+export const MyExperiences = () => {
 
     const API_URL = 'http://localhost:8000';
 
@@ -30,14 +30,14 @@ export const MyProperties = () => {
         setLoading( false );
     }
 
-    async function getUserProperties(user){
+    async function getUserExperiences(user){
         const paramsUpload = {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
             }
         };
-        const url = `${API_URL}/properties?owner=${user}`;
+        const url = `${API_URL}/experiences?owner=${user}`;
         const response = await fetch(
             url,
             paramsUpload
@@ -57,7 +57,7 @@ export const MyProperties = () => {
 
 
     useEffect( () => {
-        getUserProperties(localStorage.getItem('username'));
+        getUserExperiences(localStorage.getItem('username'));
     }, []);
 
 
@@ -66,26 +66,26 @@ export const MyProperties = () => {
         <Container>
             <Grid container spacing={5}>
                 {inmuebles.length > 0 ? 
-                    inmuebles.map( (prop, idx) => {
+                    inmuebles.map( (exp, idx) => {
                         return (
-                            <Grid style={{"marginTop":"2rem"}} item xs={4} key={`${prop.key}_${urlsImages[idx]}`}>
-                                <MyProperty 
-                                    id={prop.key}
-                                    key={`${prop.key}_${urlsImages[idx]}`}
-                                    name={prop.name} 
-                                    owner={prop.owner} 
-                                    price={prop.price} 
-                                    description={prop.description} 
-                                    location={prop.location} 
-                                    score={prop.score} 
+                            <Grid style={{"marginTop":"2rem"}} item xs={4} key={`${exp.key}_${urlsImages[idx]}`}>
+                                <MyExperience
+                                    id={exp.key}
+                                    key={`${exp.key}_${urlsImages[idx]}`}
+                                    name={exp.name} 
+                                    owner={exp.owner} 
+                                    price={exp.price} 
+                                    description={exp.description} 
+                                    location={exp.location} 
+                                    score={exp.score} 
                                     photos={ urlsImages.length > 0 ? urlsImages[idx] : []}
-                                    photosName = {prop.photos}
+                                    photosName = {exp.photos}
                                 />
                             </Grid>
                         )
                     }) : 
                     <Grid style={{marginTop:"3rem", textAlign:"center"}} item xs={12}>
-                        <h4>You have no properties uploaded yet.</h4>
+                        <h4>You have no experiences uploaded yet.</h4>
                     </Grid>
                 }
             </Grid>

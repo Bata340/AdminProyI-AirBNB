@@ -78,6 +78,7 @@ export const MyPropertiesRequests = () => {
   }
 
   const handlePropProcessed = async (bookingId) => {
+    window.dispatchEvent(new Event('payment'));
     setPropsBookings(propsBookings.filter((pb) => pb.id != bookingId));
   };
 

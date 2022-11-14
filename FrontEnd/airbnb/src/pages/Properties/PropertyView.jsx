@@ -5,19 +5,9 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { PhotoProperty } from '../PropertiesEdit/PhotoProperty';
-import Carousel from 'react-material-ui-carousel'
+import Carousel from 'react-material-ui-carousel';
+import { PaymentDialog } from "../../common/BookingDialog/PaymentDialog";
 
-const settingsSlider = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    centerMode: true,
-    variableWidth: true,
-    swipeToSlide: true,
-    edgeFriction: 0.15,
- };
 
 export const PropertyView = (props) => {
 
@@ -34,11 +24,47 @@ export const PropertyView = (props) => {
     const API_URL = 'http://localhost:8000';
     const navigate = useNavigate();
 
-    const onSubmit = async (event) => {
+    const onSubmit = (event) => {
         event.preventDefault();
         if(!checkin || !checkout){
             setShowErrorDialog(true);
+        }else{
+            setShowDialog(true);
         }
+    }
+
+
+    const payTheReservation = async (reservationId) => {
+
+        const millisecondsToDaysDivisor = (1000*3600*24);
+        const timeReservationInMs = (new Date(checkout).getTime() - new Date(checkin).getTime());
+        const quantityOfDays = timeReservationInMs / millisecondsToDaysDivisor;
+        const finalPrice = property.price * quantityOfDays;
+        
+        const paramsPost = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+        const url = `${API_URL}/property/payReservation/${reservationId}?amount=${finalPrice}`;
+        const response = await fetch(
+            url,
+            paramsPost
+        );
+        const jsonResponse = await response.json();
+        if (response.status === 200){
+            if(!jsonResponse.status_code){
+                return;
+            }else{
+                throw new Error("Error Code: "+jsonResponse.status_code);
+            }
+        }
+        throw new Error("Error Code: "+jsonResponse.status_code);
+    }
+
+
+    const paymentAndReservation = async () => {
         const paramsPost = {
             method: "POST",
             headers: {
@@ -59,10 +85,15 @@ export const PropertyView = (props) => {
         const jsonResponse = await response.json();
         if (response.status === 200){
             if(!jsonResponse.status_code){
-                setShowDialog(true);
+                await payTheReservation(jsonResponse.reservation_id);
+                return;
+            }else{
+                throw new Error("Error Code: "+jsonResponse.status_code);
             }
         }
+        throw new Error("Error Code: "+jsonResponse.status_code);
     }
+
 
     const goBackToHome = (event) => {
       navigate('/');
@@ -237,109 +268,81 @@ export const PropertyView = (props) => {
                             <Typography>{property.numOfVotes} opinion{props.numOfVotes !== 1? "s" : null}</Typography>
                         </Container>
                     </Grid> 
-                    
-                    
-                    
-                    
                 </Grid>
                 
                 <Grid container 
                      margin={10}>
                     <LocalizationProvider  dateAdapter={AdapterDayjs } >
-                    <Grid container justifyContent="center"  item xs={6}>
-                        <DatePicker 
-                            id="checkin"
-                            label="Check-In"
-                            inputFormat="DD/MM/YYYY"
-                            value={checkin || null}
-                            onChange={(event) => {
-                                setCheckin(event); 
-                                if ( event ){
-                                    setReadonlyCheckOut(false);
-                                }else{
-                                    setReadonlyCheckOut(true);
-                                }
-                            }}
-                            shouldDisableDate={isInvalidDateCheckIn}
-                            renderInput={(params) => <TextField {...params} />}
-                        />
-                    </Grid>
-                    <Grid container justifyContent="center"  item xs={6}>
-                        <DatePicker
-                            id="checkout"
-                            label="Check-Out"
-                            inputFormat="DD/MM/YYYY"
-                            readOnly={readonlyCheckout}
-                            value={checkout || null}
-                            onChange={(event) => {
-                                if(!isInvalidCheckout(event)){
-                                    setCheckout(new Date(event.toISOString()));
-                                }else{
-                                    setCheckout(null);
-                                }
-                                setCheckout(event);
-                            }}
-                            renderInput={(params) => <TextField {...params} />}
-                            shouldDisableDate={isInvalidCheckout}
-                        />
-                    </Grid>
+                        <Grid container justifyContent="center"  item xs={6}>
+                            <DatePicker 
+                                id="checkin"
+                                label="Check-In"
+                                inputFormat="DD/MM/YYYY"
+                                value={checkin || null}
+                                onChange={(event) => {
+                                    setCheckin(event); 
+                                    if ( event ){
+                                        setReadonlyCheckOut(false);
+                                    }else{
+                                        setReadonlyCheckOut(true);
+                                    }
+                                }}
+                                shouldDisableDate={isInvalidDateCheckIn}
+                                renderInput={(params) => <TextField {...params} />}
+                            />
+                        </Grid>
+                        <Grid container justifyContent="center"  item xs={6}>
+                            <DatePicker
+                                id="checkout"
+                                label="Check-Out"
+                                inputFormat="DD/MM/YYYY"
+                                readOnly={readonlyCheckout}
+                                value={checkout || null}
+                                onChange={(event) => {
+                                    if(!isInvalidCheckout(event)){
+                                        setCheckout(new Date(event.toISOString()));
+                                    }else{
+                                        setCheckout(null);
+                                    }
+                                    setCheckout(event);
+                                }}
+                                renderInput={(params) => <TextField {...params} />}
+                                shouldDisableDate={isInvalidCheckout}
+                            />
+                        </Grid>
                         
                     
                     </LocalizationProvider>
                 </Grid>
-                <>
                     <Container  className={"buttonClass"} maxWidth="sm">
                         <Button type="submit" variant="contained" sx={{fontSize:16}}>Book this property</Button>
                     </Container>
-                    
-                </>
                 
                 </Grid>
                 
             </Container>
         </form>
 
-        <Dialog
-            open={showDialog}
-            onClose={goBackToHome}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-        >
-            <DialogTitle id="alert-dialog-title">
-            {"Booking was succesful"}
-            </DialogTitle>
-            <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-                You have booked this property succesfully. 
-                <br/>
-                <strong>Now you just need to be accepted by the owner of the property</strong>. 
-                <br/><br/>
-                We will return you to the homepage after closing this dialog.
-            </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-            <Button onClick={() => {goBackToHome()}}>OK</Button>
-            </DialogActions>
-      </Dialog>
+        <PaymentDialog open={showDialog} setOpen={setShowDialog} typeOfBooking="property" paymentFunction={paymentAndReservation}/>
 
-      <Dialog
+        <Dialog
             open={showErrorDialog}
             onClose={() => setShowErrorDialog(false)}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >
             <DialogTitle id="alert-dialog-title">
-            {"Error: Booking not completed."}
+                Error: Booking not completed.
             </DialogTitle>
             <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-                Something went wrong with your booking. Check the Check-In and Check-Out dates in order to continue.
-            </DialogContentText>
+                <DialogContentText id="alert-dialog-description">
+                    Something went wrong with your booking. Check the Check-In and Check-Out dates in order to continue.
+                </DialogContentText>
             </DialogContent>
             <DialogActions>
-            <Button onClick={() => setShowErrorDialog(false)}>OK</Button>
+                <Button onClick={() => setShowErrorDialog(false)}>OK</Button>
             </DialogActions>
-      </Dialog>
+        </Dialog>
     </>
   )
 }
