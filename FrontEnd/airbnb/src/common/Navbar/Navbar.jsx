@@ -111,7 +111,7 @@ export const NavBar = () => {
                                 <NavDropdown.Item href="/experiences/admin-my-experiences" className="experienceItem">
                                     Manage My Experiences
                                 </NavDropdown.Item>
-                                <NavDropdown.Item href="/my-experiences" className="experienceItem">
+                                <NavDropdown.Item href="/my-experiences-reserved" className="experienceItem">
                                     Manage My Schedule
                                 </NavDropdown.Item>
                             </>

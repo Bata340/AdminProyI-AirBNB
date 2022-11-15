@@ -60,7 +60,6 @@ def filterPropertiesByOwner(propiesties, owner):
 def filterPropertiesByLocation(properties, location):
     locationPropertiesList = []
     for value in properties:
-        print(value.location == location)
         if value.location == location:
             locationPropertiesList.append(value)
     return locationPropertiesList
@@ -330,6 +329,20 @@ async def get_user_reservations(username: str):
     return user_reservations
 
 
+@router.get("/users/experiences/myReservation/{username}", status_code=status.HTTP_200_OK)
+async def get_user_experiencesreservations(username: str):
+    user_reservations = []
+    for _, value in reservedExperience.items():
+        for reservation in value:
+            if  reservation.userid == username :
+                objectToAppend = {
+                    "reservation": reservation,
+                    "experience": registeredExperiences[reservation.propertyId]
+                }
+                user_reservations.append(objectToAppend)
+    return user_reservations
+
+
 @router.post("/users/reservation/{reservationId}", status_code=status.HTTP_200_OK)
 async def process_reservation(reservationId: str, status: str, propertyId: str):
     reservation = findReservation(reservationId, propertyId)
@@ -419,6 +432,12 @@ lowerPrice: Optional[float] = None, highestPrice: Optional[float] = None, locati
     arrayExperiences = filterExperiencesByMaxPrice(arrayExperiences, highestPrice)
     arrayExperiences = filterExperiencesByLocation(arrayExperiences, location)
     return arrayExperiences
+
+@router.get("/experience/{id}", status_code=status.HTTP_200_OK)
+async def get_experience(id: str):
+    if id not in registeredExperiences.keys():
+        return HTTPException(status_code=404, detail="Experience with id " + id + " does not exist")
+    return registeredExperiences[id]
     
 
 @router.post("/experience", status_code=status.HTTP_200_OK)
@@ -451,11 +470,13 @@ async def delete_experience(experienceId: str):
 
 @router.post("/experience/reserve/{id}", status_code=status.HTTP_200_OK)
 async def reserve_experience(id:str, reserve: schema.Reservation):
-    if id not in ReservedExperience.keys():
-        return HTTPException(status_code=404, detail="Experience with id " + id + " does not exist")
-
-    reservedExperiences[id].append(reserve)
-    return {"message": "Experience with id " + id + "was reserve between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
+    if id not in reservedExperience.keys():
+        return HTTPException(status_code=404, detail="Experience with id " + id + " does not exist.")
+    reserve.propertyId = id
+    reserve.id = str(uuid.uuid4())
+    registeredUsers[registeredExperiences[id].owner].money += registeredExperiences[id].price
+    reservedExperience[id].append(reserve)
+    return {"message": "Experience with id " + id + " was reserved between " + reserve.dateFrom.strftime("%Y/%m/%d") + " and " + reserve.dateTo.strftime("%Y/%m/%d") }
 
 
 @router.get("/reviews/get-users-to-review/{owner_id}", status_code=status.HTTP_200_OK)

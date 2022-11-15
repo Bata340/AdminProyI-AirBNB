@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardMedia, Typography, Rating } from '@mui/material';
 
-
-
-export const ReservedProperty = (props) => {
+export const ReservedExperience = (props) => {
 
     const [ imageURL, setImageURL ] = useState( props.photos.length > 0 ? props.photos[0] : "" );
-    const [ dateFrom, setDateFrom ] = useState("");
-    const [ dateTo, setDateTo ] = useState("");
+    const [ dateBooking, setDateBooking ] = useState("");
 
     useEffect( () => {
         setImageURL(props.photos.length > 0 ? props.photos[0] : "");
@@ -15,37 +12,34 @@ export const ReservedProperty = (props) => {
 
 
     useEffect( () => {
-        const dateFromDate = new Date(props.reservation.dateFrom);
-        const stringDateFrom = `${dateFromDate.getDate()+1}/${dateFromDate.getMonth()+1}/${dateFromDate.getFullYear()}`;
-        setDateFrom(stringDateFrom);
-        const dateToDate = new Date(props.reservation.dateTo);
-        const stringDateTo = `${dateToDate.getDate()+1}/${dateToDate.getMonth()+1}/${dateToDate.getFullYear()}`;
-        setDateTo(stringDateTo);
-    }, [props.reservation.dateFrom, props.reservation.dateTo])
+        const dateBookingDate = new Date(props.reservation.dateFrom);
+        const stringDateBooking = `${dateBookingDate.getDate()+1}/${dateBookingDate.getMonth()+1}/${dateBookingDate.getFullYear()}`;
+        setDateBooking(stringDateBooking);
+    }, [props.reservation.dateFrom] )
 
 
   return (
     <Card sx={{ maxWidth: "100%", height:"100%"}}>
         <CardContent>
             <Typography variant="h5" component="div">
-            {props.property.name}
+            {props.experience.name}
             </Typography>
             <CardMedia
             component="img"
             height="194"
             image={imageURL}
-            alt={props.property.name}
+            alt={props.experience.name}
             />
 
             <Typography variant="body1">
-            From {dateFrom} To {dateTo}
+            Booking Date: {dateBooking}
             </Typography>
             <Typography variant="body2">
-            by {props.property.owner} in {props.property.location} 
+            by {props.experience.owner} in {props.experience.location} 
             </Typography>
             <Rating value={props.score} readOnly />
             <p style={{color:"blue", marginTop:"1rem"}}>
-            ${props.property.price}
+            ${props.experience.price}
             </p>
         </CardContent>
     </Card>

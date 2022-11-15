@@ -12,4 +12,6 @@ export * from './ExperiencesUpload/ExperiencesUpload';
 export * from './ReservedProperties/ReservedProperties';
 export * from './MyExperiences/MyExperiences';
 export * from './ExperiencesList/Experiences';
+export * from './ReservedExperiences/ReservedExperiences';
+export * from './ExperienceView/ExperienceView';
 
