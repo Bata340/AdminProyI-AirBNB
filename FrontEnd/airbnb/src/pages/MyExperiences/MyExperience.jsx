@@ -6,27 +6,27 @@ import {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import { deleteFirebaseImage } from '../../common/FirebaseHandler';
 
-export default function MyExperience (exp) {
+export default function MyExperience (props) {
 
-  const [imageURL, setImageURL] = useState( exp.photos[0] );
+  const [imageURL, setImageURL] = useState( props.photos[0] );
   const [openDialog, setOpenDialog] = useState(false);
 
   const API_URL = 'http://localhost:8000';
 
   let navigate = useNavigate(); 
   const routeChange = () =>{ 
-    let path = `/experiences/edit?id=${exp.id}`; 
+    let path = `/experiences/edit?id=${props.id}`; 
     navigate(path);
   }
 
   useEffect( () => {
-    setImageURL(exp.photos[0]);
-  }, [exp.photos]);
+    setImageURL(props.photos[0]);
+  }, [props.photos]);
 
 
   const handleDelete = async () => {
-    for (let i=0; i<exp.photosName.length; i++){
-      await deleteFirebaseImage(`files/${exp.photosName[i]}`);
+    for (let i=0; i<props.photosName.length; i++){
+      await deleteFirebaseImage(`files/${props.photosName[i]}`);
     }
     const paramsDelete = {
       method: "DELETE",
@@ -34,10 +34,10 @@ export default function MyExperience (exp) {
           'Content-Type': 'application/json',
       },
       body: {
-        "id": exp.id
+        "id": props.id
       }
     };
-    const url = `${API_URL}/experience/${exp.id}`;
+    const url = `${API_URL}/experience/${props.id}`;
     const response = await fetch(
         url,
         paramsDelete
@@ -55,24 +55,24 @@ export default function MyExperience (exp) {
       <Card sx={{ maxWidth: "100%", height:"100%"}}>
         <CardContent>
           <Typography variant="h5" component="div">
-            {exp.name}
+            {props.name}
           </Typography>
 
           <CardMedia
             component="img"
             height="194"
             image={imageURL}
-            alt={exp.name}
+            alt={props.name}
           />
 
           <Typography variant="body1">
-            {exp.description}
+            {props.description}
           </Typography>
           <Typography variant="body2">
-            by {exp.owner} in {exp.location} [{exp.score}]
+            by {props.owner} in {props.location} [{props.score}]
           </Typography>
           <p style={{color:"blue", marginTop:"1rem"}}>
-            ${exp.price}
+            ${props.price}
           </p>
         </CardContent>
         <CardActions>
@@ -104,7 +104,7 @@ export default function MyExperience (exp) {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete the experiences: {exp.name}
+            Are you sure you want to delete the experiences: {props.name}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

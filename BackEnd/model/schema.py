@@ -58,9 +58,16 @@ class Experience(BaseModel):
     type: str
     languages: List[str]
 
+class ExperiencePatch(BaseModel):
+    name: Optional[str]
+    price: Optional[int]
+    description: Optional[str] 
+    location: Optional[str]
+    photos: Optional[List[str]]
+    languages: Optional[List[str]]
+
 class PropertyFilters(BaseModel):
     
-
     owner: Optional[str] = None
     lowerPrice: Optional[int] = None
     highestPrice: Optional[int] = None

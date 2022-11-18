@@ -1,7 +1,8 @@
-import { Button, Container, TextField, Alert, AlertTitle, Collapse, Input, CircularProgress, Select  } from '@mui/material';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Button, Container, TextField, Alert, AlertTitle, Collapse, CircularProgress, Grid, Input, Select } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { handleUploadFirebaseImage, deleteFirebaseImage } from '../../common/FirebaseHandler';
+import { PhotoExperience } from './PhotoExperience';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -14,58 +15,56 @@ const languagesList = [
     'English',
     'Italiano',
     'Français',
-];
+  ]; 
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
-  PaperProps: {
+    PaperProps: {
     style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250,
+      },
     },
-  },
-};
+  };
 
-export const ExperiencesUpload = (exp) => {
+export const ExperiencesEdit = (exp) => {
 
+    const [searchParams] = useSearchParams();
     const [price, setPrice] = useState(0);
-    const [experienceName, setExperienceName] = useState('');
-    const [location, setLocation] = useState('');
-    const [description, setDescription] = useState('');
+    const [ExperienceName, setExperienceName] = useState('');
     const [languages, setLanguages] = useState([]);
+    const [location, setLocation] = useState('');
     const [type, setType] = useState('');
+    const [description, setDescription] = useState('');
     const [photosNamesHashed, setPhotosNamesHashed] = useState([]);
     const [photosUpload, setPhotosUpload] = useState([]);
     const [fileInputShow, setFileInputShow] = useState("");
-    const [showErrorExperienceUpload, setShowErrorExperienceUpload] = useState(false);
-    const [errorExperienceUpload, setErrorExperienceUpload] = useState('');
+    const [showErrorExperienceEdit, setShowErrorExperienceEdit] = useState(false);
+    const [erorExperienceEdit, setErrorExperienceEdit] = useState('');
     const [loadingAsync, setLoadingAsync] = useState(false);
     const API_URL = 'http://localhost:8000';
     const navigate = useNavigate();
 
-    const onSubmitUpload = async (event) => {
+    const onSubmitEdit = async (event) => {
         event.preventDefault();
         setLoadingAsync(true);
         let photosNames = await handleUploadPhotos();
         const paramsUpload = {
-            method: "POST",
+            method: "PATCH",
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                name: experienceName,
-                owner: localStorage.getItem('username'),
+                name: ExperienceName,
                 price: price,
                 description: description,
                 location: location,
-                type: type,
-                score: [],
                 photos: photosNames,
                 languages: languages
             })
         };
-        const url = `${API_URL}/experience/`;
+        const url = `${API_URL}/experiences/${searchParams.get("id")}`;
         const response = await fetch(
             url,
             paramsUpload
@@ -74,26 +73,81 @@ export const ExperiencesUpload = (exp) => {
         setLoadingAsync(false);
         if (response.status === 200){
             if(!jsonResponse.status_code){
-                navigate('/experiences');
+                navigate('/experience/admin-my-experiences');
                 window.location.reload();
             }else{
-                setErrorExperienceUpload(jsonResponse.detail);
-                setShowErrorExperienceUpload(true);
+                setErrorExperienceEdit(jsonResponse.detail);
+                setShowErrorExperienceEdit(true);
             }
         }
     }
 
     const onCloseError = (event) => {
-        setShowErrorExperienceUpload(false);
-        setErrorExperienceUpload('');
+        setShowErrorExperienceEdit(false);
+        setErrorExperienceEdit('');
     }
 
-    const goBackToExperiences = (event) => {
-      navigate('/experiences');
+    const goBackToHome = (event) => {
+      navigate('/');
     }
+
+    const onRemoveImage = async( nameImage ) => {
+        const paramsDelete = {
+            method: "DELETE",
+            headers: {
+                'Content-Type': 'application/json',
+            }
+          };
+          const url = `${API_URL}/experience/${searchParams.get("id")}/photos/${nameImage}`;
+          const response = await fetch(
+              url,
+              paramsDelete
+          );
+          const jsonResponse = await response.json();
+          if (response.status === 200){
+              if(!jsonResponse.status_code){
+                await deleteFirebaseImage( `files/${nameImage}` );
+                setPhotosNamesHashed( photosNamesHashed.filter( element => element !== nameImage ) );
+              }
+          }
+    }
+
+    const getDataForFields = async (id) => {
+        const paramsUpload = {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+        const url = `${API_URL}/experience/${id}`;
+        const response = await fetch(
+            url,
+            paramsUpload
+        );
+        const jsonResponse = await response.json();
+        {console.log(jsonResponse)}
+        if (response.status === 200){
+            if(!jsonResponse.status_code){
+                setPrice(jsonResponse.message.price);
+                setExperienceName(jsonResponse.message.name);
+                setLocation(jsonResponse.message.location);
+                setDescription(jsonResponse.message.description);
+                setPhotosNamesHashed(jsonResponse.message.photos);
+                setType(jsonResponse.message.type);
+                setLanguages(jsonResponse.message.languages)
+            }else{
+                setErrorExperienceEdit(jsonResponse.detail);
+                setShowErrorExperienceEdit(true);
+            }
+        }
+    }
+
+    useEffect(() => {
+        getDataForFields(searchParams.get("id"));
+    }, []);
 
     const handleUploadPhotos = async () => {
-        const hashedNames = [];
+        const hashedNames = photosNamesHashed;
         for ( let i=0; i<photosUpload.length; i++ ){
             hashedNames.push(await handleUploadFirebaseImage(photosUpload[i].name, photosUpload[i]) );
         }
@@ -101,31 +155,28 @@ export const ExperiencesUpload = (exp) => {
         return hashedNames;
     }
 
-
     const handleLanguages = (event) => {
         const {
             target: { value },
         } = event;
         setLanguages(
-            // On autofill we get a stringified value.
             typeof value === 'string' ? value.split(',') : value,
+
           );
     }
 
-
-
   return (
     <>
-        <form onSubmit = {onSubmitUpload}>
+        <form onSubmit = {onSubmitEdit}>
             <Container maxWidth="sm" id="formWrapper">
-                <Collapse in={showErrorExperienceUpload}>
+                <Collapse in={showErrorExperienceEdit}>
                     <Alert onClose={onCloseError} severity="error" id="AlertError">
-                        <AlertTitle><strong>Experience Upload Error</strong></AlertTitle>
-                            {errorExperienceUpload}
+                        <AlertTitle><strong>Experience Edit Error</strong></AlertTitle>
+                            {erorExperienceEdit}
                     </Alert>
                 </Collapse>
                 <Container className={"LogoContainer"}>
-                    <h1>Upload Your Experience</h1>
+                    <h1>Edit Your experience</h1>
                 </Container>
                 <Container className={"inputClass"}>
                     <TextField 
@@ -134,15 +185,15 @@ export const ExperiencesUpload = (exp) => {
                         placeholder = "Experience's name"
                         name = "experiences_name"
                         className={"inputStyle"}
-                        value={experienceName}
+                        value={ExperienceName}
                         onChange = {(event) => setExperienceName(event.target.value)}
                     />
                 </Container>
                 <Container className={"inputClass"}>
                     <TextField 
-                        label = "Price (U$D)"
+                        label = "Price Per Day (U$D)"
                         type = "number"
-                        placeholder = "Price(U$D)"
+                        placeholder = "Price Per Day (U$D)"
                         name = "Price Per Day"
                         className={"inputStyle"}
                         value={price}
@@ -203,6 +254,20 @@ export const ExperiencesUpload = (exp) => {
                         onChange = {(event) => setDescription(event.target.value)}
                     />
                 </Container>
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sx={{textAlign:"left", textDecoration:"underline", marginTop:"0.75rem"}}>
+                        <h3>Images</h3>
+                    </Grid>
+                    {
+                        photosNamesHashed.map((value) => {
+                            return(
+                            <Grid key={value} item xs={4}>
+                                <PhotoExperience nameImage={value} onRemoveImage = {onRemoveImage}/>
+                            </Grid>
+                            );
+                        })
+                    }
+                </Grid>
                 <Container className={"inputClass"} style={{width:"100%"}}>
                     <Input
                         id="photosInput"
@@ -221,10 +286,10 @@ export const ExperiencesUpload = (exp) => {
                     <CircularProgress/> : 
                 <>
                     <Container  className={"buttonClass"} maxWidth="sm">
-                        <Button type="submit" variant="contained" sx={{fontSize:16}}>Upload</Button>
+                        <Button type="submit" variant="contained" sx={{fontSize:16}}>Save Changes</Button>
                     </Container>
                     <Container  className={"buttonClass"} maxWidth="sm">
-                        <Button type="button" variant="contained" color="error" sx={{fontSize:16}} onClick={goBackToExperiences}>Cancel</Button>
+                        <Button type="button" variant="contained" color="error" sx={{fontSize:16}} onClick={goBackToHome}>Cancel</Button>
                     </Container>
                 </>
                 }

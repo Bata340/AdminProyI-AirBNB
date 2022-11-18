@@ -14,4 +14,4 @@ export * from './MyExperiences/MyExperiences';
 export * from './ExperiencesList/Experiences';
 export * from './ReservedExperiences/ReservedExperiences';
 export * from './ExperienceView/ExperienceView';
-
+export * from './ExperiencesEdit/ExperiencesEdit';
