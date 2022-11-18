@@ -60,7 +60,8 @@ export const ExperiencesEdit = (exp) => {
                 price: price,
                 description: description,
                 location: location,
-                photos: photosNames
+                photos: photosNames,
+                languages: languages
             })
         };
         const url = `${API_URL}/experiences/${searchParams.get("id")}`;
