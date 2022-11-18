@@ -470,7 +470,7 @@ async def create_experience(experience: schema.Experience):
         price=experience.price,
         description=experience.description,
         location=experience.location,
-        score=[]
+        score=[],
         photos=experience.photos,
         type=experience.type,
         languages=experience.languages
