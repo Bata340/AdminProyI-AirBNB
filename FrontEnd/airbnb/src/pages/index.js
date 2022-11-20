@@ -15,3 +15,5 @@ export * from './ExperiencesList/Experiences';
 export * from './ReservedExperiences/ReservedExperiences';
 export * from './ExperienceView/ExperienceView';
 export * from './ExperiencesEdit/ExperiencesEdit';
+export * from './OwnersScheduleView/ExperiencesScheduleView';
+export * from './OwnersScheduleView/OwnersScheduleView';

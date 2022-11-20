@@ -236,6 +236,8 @@ async def delete_property(id: str):
     if id not in registeredProperties.keys():
         return HTTPException(status_code=404, detail="Property with id " + id + " does not exist")
     registeredProperties.pop(id)
+    acceptedReservationProperties.pop(id)
+    requestedreserveProperties.pop(id)
     return {"message": "property with id " + id + "was deleted"} 
 
 @router.delete("/property/{id_prop}/photos/{id_photo}")
@@ -485,6 +487,7 @@ async def delete_experience(id: str):
     if id not in registeredExperiences.keys():
         return HTTPException(status_code=404, detail="Experience with id " + id + " does not exist")
     registeredExperiences.pop(id)
+    reservedExperience.pop(id)
     return {"message": "Experience with id " + id + "was deleted"} 
 
 @router.delete("/experience/{id_exp}/photos/{id_photo}")
@@ -545,4 +548,33 @@ async def get_users_to_review(user_id: str):
             if not any(prop.get("key", None) == reservation.propertyId for prop in propertiesToReturn):
                 propertiesToReturn.append({"key": reservation.propertyId, "property": registeredProperties[reservation.propertyId]})
     return propertiesToReturn
+
+
+@router.get("/properties/bookings-accepted/{user_id}", status_code=status.HTTP_200_OK)
+async def get_bookings_for_user_properties(user_id: str):
+    keysPropertiesFromOwner = filter(
+        lambda keyProp: registeredProperties[keyProp].owner == user_id,
+        registeredProperties
+    )
+    bookings = []
+    for key in keysPropertiesFromOwner:
+        property = registeredProperties[key]
+        reservations = acceptedReservationProperties[key]
+        for reservation in reservations:
+            bookings.append({"property": property, "reservation": reservation})
+    return bookings
     
+
+@router.get("/experiences/bookings-accepted/{user_id}", status_code=status.HTTP_200_OK)
+async def get_bookings_for_user_experiences(user_id: str):
+    keysExpsFromOwner = filter(
+        lambda keyExp: registeredExperiences[keyExp].owner == user_id,
+        registeredExperiences
+    )
+    bookings = []
+    for key in keysExpsFromOwner:
+        expe = registeredExperiences[key]
+        reservations = reservedExperience[key]
+        for reservation in reservations:
+            bookings.append({"experience": expe, "reservation": reservation})
+    return bookings

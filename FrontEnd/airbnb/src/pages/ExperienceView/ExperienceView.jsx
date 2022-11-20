@@ -65,39 +65,6 @@ export const ExperienceView = () => {
       navigate('/experiences/');
     }
 
-
-    /*const getInvalidDates = async (id) => {
-        const paramsGet = {
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        };
-        const url = `${API_URL}/property/reserveDates/${id}?type=accepted`;
-        const response = await fetch(
-            url,
-            paramsGet
-        );
-        const jsonResponse = await response.json();
-        if (response.status === 200){
-            if(!jsonResponse.status_code){
-                const url = `${API_URL}/property/reserveDates/${id}?type=requested`;
-                const responseTwo = await fetch(
-                    url,
-                    paramsGet
-                );
-                const jsonResponseTwo = await responseTwo.json();
-                if (responseTwo.status === 200){
-                    if(!jsonResponseTwo.status_code){
-                        const reservationD = jsonResponse.message.concat(jsonResponseTwo.message);
-                        setReservationDates(reservationD);
-                    }
-                }
-            }
-        }
-    }*/
-
-
     const getDataForFields = async (id) => {
         const paramsUpload = {
             method: "GET",
@@ -113,8 +80,8 @@ export const ExperienceView = () => {
         const jsonResponse = await response.json();
         if (response.status === 200){
             if(!jsonResponse.status_code){
-                setPhotosNamesHashed(jsonResponse.photos);
-                setExperience(jsonResponse);
+                setPhotosNamesHashed(jsonResponse.message.photos);
+                setExperience(jsonResponse.message);
             }
         }
     }
@@ -128,23 +95,12 @@ export const ExperienceView = () => {
         if( dateToCompare <= new Date()){
             return true;
         }
-        /*for (let i=0; i<reservationDates.length; i++){
-            const dateObject = reservationDates[i];
-            const dateFrom = new Date(dateObject.dateFrom);
-            const dateTo = new Date(dateObject.dateTo);
-            if( dateFrom <= dateToCompare && dateToCompare <= dateTo ){
-                isInvalid = true;
-                break;
-            }
-            
-        }*/
         return isInvalid;
     }
 
 
     useEffect(() => {
         getDataForFields(searchParams.get("id"));
-        //getInvalidDates(searchParams.get("id"));
     }, []);
 
 

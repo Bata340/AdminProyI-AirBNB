@@ -1,6 +1,7 @@
 import { Login, SignUp, Properties, PropertiesUpload, MyProperties, PropertiesEdit, 
 	PropertyView, MyPropertiesRequests, ReviewUsers, ReviewProperties, ExperiencesUpload,
-	MyExperiences, ReservedProperties, Experiences, ReservedExperiences, ExperienceView, ExperiencesEdit } from '../pages';
+	MyExperiences, ReservedProperties, Experiences, ReservedExperiences, ExperienceView, ExperiencesEdit,
+	OwnersScheduleView, ExperiencesScheduleView } from '../pages';
 import { NavBar } from '../common/Navbar/Navbar';
 import{ BrowserRouter as Router, Routes as Switch, Route } from 'react-router-dom';
 import '../common/common.css';
@@ -31,15 +32,12 @@ function ReactRoutes() {
 					<Route exact path="/experiences/add" element={<ExperiencesUpload/>}/>
 					<Route exact path="/experiences/admin-my-experiences" element={<MyExperiences/>}/>
 					<Route exact path="/experiences/edit" element={<ExperiencesEdit/>}/>
-
+					<Route exact path="/experiences/bookings" element={<ExperiencesScheduleView/>}/>
+					<Route exact path="/properties/bookings" element={<OwnersScheduleView/>}/>
 				</Switch>
 			</Router>
 		</>
 	);
 }
-
-//"/experiences/admin-my-experiences"
-//"/my-experiences"
-
 
 export default ReactRoutes;

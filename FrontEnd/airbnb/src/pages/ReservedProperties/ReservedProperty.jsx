@@ -41,7 +41,7 @@ export const ReservedProperty = (props) => {
             From {dateFrom} To {dateTo}
             </Typography>
             <Typography variant="body2">
-            by {props.property.owner} in {props.property.location} 
+            by {props.schedule ? props.property.owner : props.reservation.userid} in {props.property.location} 
             </Typography>
             <Rating value={props.score} readOnly />
             <p style={{color:"blue", marginTop:"1rem"}}>

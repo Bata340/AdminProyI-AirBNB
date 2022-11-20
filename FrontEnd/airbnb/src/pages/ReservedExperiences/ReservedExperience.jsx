@@ -35,7 +35,7 @@ export const ReservedExperience = (props) => {
             Booking Date: {dateBooking}
             </Typography>
             <Typography variant="body2">
-            by {props.experience.owner} in {props.experience.location} 
+            by {props.schedule ? props.experience.owner : props.reservation.userid} in {props.experience.location} 
             </Typography>
             <Rating value={props.score} readOnly />
             <p style={{color:"blue", marginTop:"1rem"}}>

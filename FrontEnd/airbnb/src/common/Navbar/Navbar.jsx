@@ -63,7 +63,7 @@ export const NavBar = () => {
             window.removeEventListener('storage', handleStorage); 
             window.removeEventListener('payment', retrieveMoney);
         };
-    }, []);
+    });
 
 
 	return (
@@ -91,7 +91,10 @@ export const NavBar = () => {
                                 Manage My Schedule
                             </NavDropdown.Item>
                             <NavDropdown.Item href="/Properties/Requests" className="propertyItem">
-                                My Properties`s Requests
+                                My Properties's Requests
+                            </NavDropdown.Item>
+                            <NavDropdown.Item href="/Properties/Bookings" className="propertyItem">
+                                My Properties's Bookings
                             </NavDropdown.Item>
                         </NavDropdown>
                     }
@@ -113,6 +116,9 @@ export const NavBar = () => {
                                 </NavDropdown.Item>
                                 <NavDropdown.Item href="/my-experiences-reserved" className="experienceItem">
                                     Manage My Schedule
+                                </NavDropdown.Item>
+                                <NavDropdown.Item href="/experiences/bookings" className="experienceItem">
+                                    My Experiences's Bookings
                                 </NavDropdown.Item>
                             </>
                         }

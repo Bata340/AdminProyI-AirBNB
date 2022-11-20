@@ -63,16 +63,20 @@ export const ReservedExperiences = () => {
       <>
       {!loading ?
           <Container style={{marginTop:"3rem"}}>
-            <h1>My Experiences Bookings</h1>
-            <Grid container justifyContent="center" alignItems="center">
+            <h1>My Schedule - Experiences</h1>
+            {reservationsToShow.length > 0 ?
+            <Grid container justifyContent="center" alignItems="center" spacing={4}>
               {reservationsToShow.map( (reservation, idx) => {
                 return(
                   <Grid key={reservation.reservation.id} item xs={12} md={6} lg={4} style={{maringTop:"1rem"}}>
-                    <ReservedExperience experience={reservation.experience} reservation={reservation.reservation} photos={ urlsImages.length > 0 ? urlsImages[idx] : []}/>
+                    <ReservedExperience schedule={true} experience={reservation.experience} reservation={reservation.reservation} photos={ urlsImages.length > 0 ? urlsImages[idx] : []}/>
                   </Grid>
                 );
               })}
             </Grid>
+            :
+            <h4 style={{textAlign:"center"}}>You have no experiences booked yet.</h4>
+            }
           </Container>
         :
           <CircularProgress style={{
