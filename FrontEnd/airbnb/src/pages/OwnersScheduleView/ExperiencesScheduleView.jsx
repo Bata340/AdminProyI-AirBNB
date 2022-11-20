@@ -1,23 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Container, Grid, CircularProgress } from '@mui/material';
 import { getFirebaseImage } from '../../common/FirebaseHandler';
-import { ReservedProperty } from "./ReservedProperty";
+import { ReservedExperience } from "../ReservedExperiences/ReservedExperience";
 
-export const ReservedProperties = () => {
-
+export const ExperiencesScheduleView = () => {
   const API_URL = 'http://localhost:8000';
 
   const [ reservationsToShow, setReservationsToShow ] = useState( [] );
   const [ loading, setLoading ] = useState( true );
   const [ urlsImages, setUrlsImages ] = useState( [] );
 
-  async function getImagesFromFireBase( inmueblesVar ){
+  async function getImagesFromFireBase( experiencesVar ){
       const urlsArray = [];
-      for ( let i=0; i < inmueblesVar.length ; i++ ){
+      for ( let i=0; i < experiencesVar.length ; i++ ){
           const arrayURLS = [];
-          for ( let j=0; j < inmueblesVar[i].photos.length ; j++ ){
+          for ( let j=0; j < experiencesVar[i].photos.length ; j++ ){
               const url = await getFirebaseImage( 
-                  `files/${inmueblesVar[i].photos[j]}`
+                  `files/${experiencesVar[i].photos[j]}`
               );
               arrayURLS.push(url);
           }
@@ -34,7 +33,7 @@ export const ReservedProperties = () => {
             'Content-Type': 'application/json',
         }
     };
-    const url = `${API_URL}/users/myReservation/${localStorage.getItem("username")}`;
+    const url = `${API_URL}/experiences/bookings-accepted/${localStorage.getItem("username")}`;
     const response = await fetch(
         url,
         paramsGet
@@ -42,11 +41,11 @@ export const ReservedProperties = () => {
     const jsonResponse = await response.json();
     if (response.status === 200){
         if(!jsonResponse.status_code){
-          const arrayProps = [];
+          const arrayExps = [];
           for (let i=0; i<jsonResponse.length; i++){
-            arrayProps.push(jsonResponse[i].property);
+            arrayExps.push(jsonResponse[i].experience);
           }
-          await getImagesFromFireBase( arrayProps );
+          await getImagesFromFireBase( arrayExps );
           setReservationsToShow( jsonResponse );
           setLoading( false );
         }
@@ -63,19 +62,19 @@ export const ReservedProperties = () => {
       <>
       {!loading ?
           <Container style={{marginTop:"3rem"}}>
-            <h1>My Schedule - Properties</h1>
+            <h1>My Experiences Bookings</h1>
             {reservationsToShow.length > 0 ?
             <Grid container justifyContent="center" alignItems="center" spacing={4}>
               {reservationsToShow.map( (reservation, idx) => {
                 return(
                   <Grid key={reservation.reservation.id} item xs={12} md={6} lg={4} style={{maringTop:"1rem"}}>
-                    <ReservedProperty schedule={true} property={reservation.property} reservation={reservation.reservation} photos={ urlsImages.length > 0 ? urlsImages[idx] : []}/>
+                    <ReservedExperience schedule={false} experience={reservation.experience} reservation={reservation.reservation} photos={ urlsImages.length > 0 ? urlsImages[idx] : []}/>
                   </Grid>
                 );
               })}
             </Grid>
             :
-            <h4 style={{textAlign:"center"}}>You have no properties booked yet.</h4>
+            <h4 style={{textAlign:"center"}}>You have no bookings in your experiences yet.</h4>
             }
           </Container>
         :

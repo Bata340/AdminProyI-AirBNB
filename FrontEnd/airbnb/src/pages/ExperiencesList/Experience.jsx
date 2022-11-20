@@ -32,6 +32,7 @@ export default function Experience (props) {
             inputProps={
                 {readOnly: true}
             }
+            readOnly={true}
             style={{width:"100%", marginTop: "1rem", marginBottom: "1rem"}}
         />
         <Typography variant="body2">

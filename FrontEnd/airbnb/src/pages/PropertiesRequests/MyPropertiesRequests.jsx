@@ -116,10 +116,10 @@ export const MyPropertiesRequests = () => {
                   user={prop.userid}
                   userScore={prop.userScore}
                   userNumOfVotes = {prop.numberOfOpinionsUser}
-                  checkin={`${dateFrom.getDate()}/${
+                  checkin={`${dateFrom.getDate()+1}/${
                     dateFrom.getMonth() + 1
                   }/${dateFrom.getFullYear()}`}
-                  checkout={`${dateTo.getDate()}/${
+                  checkout={`${dateTo.getDate()+1}/${
                     dateTo.getMonth() + 1
                   }/${dateTo.getFullYear()}`}
                   photos={
